@@ -1,18 +1,13 @@
 import { Editor } from '@monaco-editor/react'
-import { useState } from 'react'
 
-export const MonacoEditor = () => {
-  const [value, setValue] = useState('// some comment')
-
+export const MonacoEditor = ({ onChange }: { onChange?: (value: string | undefined) => void }) => {
   return (
-    <div>
-      <Editor
-        height="64vh"
-        width="64vh"
-        defaultLanguage="typescript"
-        defaultValue={value}
-        onChange={(value) => { setValue(value ?? '') }}
-      />
-    </div>
+    <Editor
+      height="80vh"
+      width="80vh"
+      defaultLanguage="typescript"
+      defaultValue="// some comment"
+      onChange={onChange}
+    />
   )
 }
