@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { play } from '../pdg/playground'
 import { MonacoEditor } from './MonacoEditor'
 import './App.css'
 
@@ -13,7 +14,7 @@ export const App = () => {
       </div>
       <div className="content-container">
         <h2>Content</h2>
-        <pre>{source}</pre>
+        <pre>{play(source)}</pre>
       </div>
     </div>
   )
