@@ -1,7 +1,7 @@
 import * as ts from 'typescript'
-import { basicBlocks } from './bb'
+import { basicBlocks, type BasicBlock } from './bb'
 
-export const play = (source: string) => {
+export const play = (source: string): BasicBlock => {
   const file = ts.createSourceFile(
     'source.ts',
     source,

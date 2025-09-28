@@ -10,19 +10,21 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
+    "@dagrejs/dagre": "^1.1.5",
+    "@monaco-editor/react": "4.7.0",
+    "@xyflow/react": "^12.8.5",
     "monaco-editor": "^0.53.0",
-    "@monaco-editor/react": "4.7.0"
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
+    "@stylistic/eslint-plugin": "^5.4.0",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.3",
     "babel-plugin-react-compiler": "^19.1.0-rc.3",
     "eslint": "^9.36.0",
-    "@stylistic/eslint-plugin": "^5.4.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.4.0",

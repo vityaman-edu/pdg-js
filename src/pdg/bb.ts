@@ -1,35 +1,36 @@
 import * as ts from 'typescript'
 
-interface Halt {
+export interface Halt {
   kind: 'halt'
 }
 
-interface Jump {
+export interface Jump {
   kind: 'jump'
   next: BasicBlock
 };
 
-interface Branch {
+export interface Branch {
   kind: 'branch'
   condition: ts.Expression
   then: BasicBlock
   else: BasicBlock
 }
 
-type Transition = Halt | Jump | Branch
+export type Transition = Halt | Jump | Branch
 
-interface BasicBlock {
+export interface BasicBlock {
   id: string
   parents: BasicBlock[]
   statements: ts.Node[]
   end: Transition
 };
 
-export const printBasicBlocks = (entry: BasicBlock) => {
+export const forEachBasicBlock = (
+  entry: BasicBlock,
+  visit: (block: BasicBlock) => void,
+) => {
   const visited: BasicBlock[] = []
   const queue = [entry]
-
-  let output = ''
 
   for (;;) {
     const block = queue.shift()
@@ -41,37 +42,59 @@ export const printBasicBlocks = (entry: BasicBlock) => {
     }
     visited.push(block)
 
-    output += `${block.id}:\n`
-    for (const statement of block.statements) {
-      output += '  '
-      output += `${statement.getText()}\n`
-    }
+    visit(block)
 
-    output += '  '
     const end = block.end
     switch (end.kind) {
-      case 'halt': {
-        output += 'halt'
-      } break
       case 'jump': {
         queue.push(end.next)
-        output += `jump to ${end.next.id}`
       } break
       case 'branch': {
         queue.push(end.then, end.else)
-        output += (
-          `jump if (${end.condition.getText()})`
-          + ` to ${end.then.id} else ${end.else.id}`
-        )
       } break
     }
-    output += '\n'
   }
+}
+
+export const toString = (block: BasicBlock) => {
+  let output = ''
+
+  output += `${block.id}:\n`
+  for (const statement of block.statements) {
+    output += '  '
+    output += `${statement.getText()}\n`
+  }
+
+  output += '  '
+  const end = block.end
+  switch (end.kind) {
+    case 'halt': {
+      output += 'halt'
+    } break
+    case 'jump': {
+      output += `jump to ${end.next.id}`
+    } break
+    case 'branch': {
+      output += (
+        `jump if (${end.condition.getText()})`
+        + ` to ${end.then.id} else ${end.else.id}`
+      )
+    } break
+  }
+  output += '\n'
 
   return output
 }
 
-export const basicBlocks = (node: ts.SourceFile) => {
+export const printBasicBlocks = (entry: BasicBlock) => {
+  let output = ''
+  forEachBasicBlock(entry, (block: BasicBlock) => {
+    output += toString(block)
+  })
+  return output
+}
+
+export const basicBlocks = (node: ts.SourceFile): BasicBlock => {
   let id = 0
 
   const newName = (prefix: string) => {
@@ -151,13 +174,10 @@ export const basicBlocks = (node: ts.SourceFile) => {
       else if (ts.isForInStatement(statement)) {
         throw new Error('Not implemented')
       }
-      else {
-        console.log(`(unknown) ${ts.SyntaxKind[statement.kind]}: ${statement.getText()}`)
-      }
     })
   }
 
   visit(node)
 
-  return printBasicBlocks(entry)
+  return entry
 }
