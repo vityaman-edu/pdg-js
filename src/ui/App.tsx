@@ -1,4 +1,4 @@
-import { Background, type Edge, Handle, type Node, Position, ReactFlow, ReactFlowProvider, useEdgesState, useNodesInitialized, useNodesState } from '@xyflow/react'
+import { Background, type Edge, Handle, MarkerType, type Node, Position, ReactFlow, ReactFlowProvider, useEdgesState, useNodesInitialized, useNodesState } from '@xyflow/react'
 import { Editor } from '@monaco-editor/react'
 import '@xyflow/react/dist/style.css'
 import './App.css'
@@ -60,6 +60,9 @@ const toGraph = (source: string) => {
       id: newId(),
       source,
       target,
+      markerEnd: {
+        type: MarkerType.ArrowClosed,
+      },
     }
   }
 
