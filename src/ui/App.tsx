@@ -251,6 +251,7 @@ export const App = () => {
           onChange={(value) => { onSourceChange(value ?? '') }}
           options={{
             fontSize: 22,
+            minimap: { enabled: false },
           }}
         />
       </div>

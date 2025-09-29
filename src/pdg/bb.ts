@@ -121,8 +121,8 @@ export const basicBlocks = (node: ts.SourceFile): BasicBlock => {
 
   let current = entry
 
-  const visit = (statement: ts.Node) => {
-    statement.forEachChild((statement) => {
+  const visit = (node: ts.Node) => {
+    node.forEachChild((statement) => {
       if (ts.isVariableStatement(statement)) {
         current.statements.push(statement)
       }
@@ -131,7 +131,7 @@ export const basicBlocks = (node: ts.SourceFile): BasicBlock => {
       }
       else if (ts.isIfStatement(statement)) {
         const parent = current
-        const next = newBasicBlock('next')
+        const next = { ...newBasicBlock('next'), end: parent.end }
 
         const thenBlock: BasicBlock = {
           id: newName('then'),
