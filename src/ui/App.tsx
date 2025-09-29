@@ -66,17 +66,19 @@ const MultilineNode = ({ data }: { data: NodeData }) => {
       >
         {data.label}
       </div>
-      <div
-        style={{
-          padding: '12px',
-          fontSize: 13,
-          fontFamily: 'monospace',
-          whiteSpace: 'pre-wrap',
-          lineHeight: 1.4,
-        }}
-      >
-        {data.body}
-      </div>
+      { data.body && (
+        <div
+          style={{
+            padding: '12px',
+            fontSize: 13,
+            fontFamily: 'monospace',
+            whiteSpace: 'pre-wrap',
+            lineHeight: 1.4,
+          }}
+        >
+          {data.body}
+        </div>
+      )}
       {data.end && (
         <div
           style={{
