@@ -56,14 +56,20 @@ export const forEachBasicBlock = (
   }
 }
 
+export const toStringStatements = (statements: ts.Node[]) => {
+  let output = ''
+  for (const statement of statements) {
+    output += '  '
+    output += `${statement.getText()}\n`
+  }
+  return output
+}
+
 export const toString = (block: BasicBlock) => {
   let output = ''
 
   output += `${block.id}:\n`
-  for (const statement of block.statements) {
-    output += '  '
-    output += `${statement.getText()}\n`
-  }
+  output += toStringStatements(block.statements)
 
   output += '  '
   const end = block.end
