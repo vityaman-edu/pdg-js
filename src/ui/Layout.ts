@@ -1,39 +1,22 @@
 import Dagre from '@dagrejs/dagre'
-import {
-  type GraphNode,
-  type GraphEdge,
-} from './Graph'
+import { type Node, type Edge } from '@xyflow/react'
 
-export const getLayoutedElements = (
-  nodes: GraphNode[],
-  edges: GraphEdge[],
-): {
-  nodes: GraphNode[]
-  edges: GraphEdge[]
-} => {
+export const layout = (nodes: Node[], edges: Edge[]) => {
   const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}))
-  g.setGraph({ })
-
-  edges.forEach(edge =>
-    g.setEdge(edge.source, edge.target),
-  )
-  nodes.forEach(node =>
-    g.setNode(node.id, {
-      ...node,
-      width: node?.width ?? 100,
-      height: node?.height ?? 100,
-    }),
-  )
+  g.setGraph({})
+  edges.forEach(edge => g.setEdge(edge.source, edge.target))
+  nodes.forEach(node => g.setNode(node.id, {
+    ...node,
+    width: node.measured?.width ?? 0,
+    height: node.measured?.height ?? 0,
+  }))
 
   Dagre.layout(g)
 
-  return {
-    nodes: nodes.map((node) => {
-      const position = g.node(node.id)
-      const x = position.x - (node?.width ?? 100) * 2
-      const y = position.y - (node?.height ?? 100) * 2
-      return { ...node, position: { x, y } }
-    }),
-    edges,
-  }
+  return nodes.map((node) => {
+    const p = g.node(node.id)
+    const x = p.x - (node.measured?.width ?? 0) / 4
+    const y = p.y - (node.measured?.height ?? 0) / 4
+    return { ...node, position: { x, y } }
+  })
 }
