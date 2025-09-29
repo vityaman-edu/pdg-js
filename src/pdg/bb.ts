@@ -148,7 +148,6 @@ export const basicBlocks = (node: ts.SourceFile): BasicBlock => {
         }
 
         next.parents.push(thenBlock, elseBlock)
-
         parent.end = {
           kind: `branch`,
           condition: statement.expression,
@@ -169,7 +168,30 @@ export const basicBlocks = (node: ts.SourceFile): BasicBlock => {
         current = next
       }
       else if (ts.isWhileStatement(statement)) {
-        throw new Error('Not implemented')
+        const parent = current
+        const next = { ...newBasicBlock('next'), end: parent.end }
+
+        const body: BasicBlock = {
+          id: newName('while'),
+          parents: [parent],
+          statements: [],
+          end: { kind: 'jump', next },
+        }
+
+        next.parents.push(body, parent)
+        parent.end = {
+          kind: `branch`,
+          condition: statement.expression,
+          then: body,
+          else: parent,
+        }
+
+        {
+          current = body
+          visit(statement.statement)
+        }
+
+        current = next
       }
       else if (ts.isDoStatement(statement)) {
         throw new Error('Not implemented')
