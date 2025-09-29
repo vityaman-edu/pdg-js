@@ -175,15 +175,24 @@ export const basicBlocks = (node: ts.SourceFile): BasicBlock => {
           id: newName('while'),
           parents: [parent],
           statements: [],
-          end: { kind: 'jump', next },
+          end: {
+            kind: 'branch',
+            condition: statement.expression,
+            then: next,
+            else: next,
+          },
+        }
+        {
+          const end = body.end as Branch
+          end.then = body
         }
 
         next.parents.push(body, parent)
         parent.end = {
-          kind: `branch`,
+          kind: 'branch',
           condition: statement.expression,
           then: body,
-          else: parent,
+          else: next,
         }
 
         {

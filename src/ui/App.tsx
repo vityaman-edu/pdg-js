@@ -1,5 +1,6 @@
 import { Background, type Edge, Handle, MarkerType, type Node, Position, ReactFlow, ReactFlowProvider, useEdgesState, useNodesInitialized, useNodesState } from '@xyflow/react'
 import { Editor } from '@monaco-editor/react'
+import { SmartBezierEdge } from '@tisoap/react-flow-smart-edge';
 import '@xyflow/react/dist/style.css'
 import './App.css'
 import { forEachBasicBlock, type BasicBlock, toStringStatements } from '../pdg/bb'
@@ -101,10 +102,6 @@ const MultilineNode = ({ data }: { data: NodeData }) => {
   )
 }
 
-const nodeTypes = {
-  multiline: MultilineNode,
-}
-
 const toGraph = (source: string) => {
   const entry = play(source)
 
@@ -153,6 +150,7 @@ const toGraph = (source: string) => {
 
     return {
       id: newId(),
+      type: 'smart',
       source,
       target,
       markerEnd: {
@@ -198,6 +196,14 @@ const toGraph = (source: string) => {
   return { nodes, edges }
 }
 
+const nodeTypes = {
+  multiline: MultilineNode,
+}
+
+const edgeTypes = {
+  smart: SmartBezierEdge,
+}
+
 export const App = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-arguments
@@ -233,6 +239,7 @@ export const App = () => {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
           fitView
         >
           <Background />
