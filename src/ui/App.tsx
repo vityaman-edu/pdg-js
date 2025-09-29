@@ -261,11 +261,16 @@ export const App = () => {
           options={{
             fontSize: 22,
             minimap: { enabled: false },
+            scrollbar: {
+              vertical: 'hidden',
+              horizontal: 'hidden',
+            },
+            overviewRulerLanes: 0,
           }}
         />
       </div>
       <div className="content-container" style={{ height: '86vh', width: '90vh' }}>
-        <h2>Basic Blocks</h2>
+        <h2>Control Flow Graph</h2>
         <ReactFlowProvider>
           <LayoutFlow />
         </ReactFlowProvider>

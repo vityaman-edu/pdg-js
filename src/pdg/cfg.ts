@@ -20,10 +20,17 @@ export type Transition = Halt | Jump | Branch
 
 export interface BasicBlock {
   id: string
-  parents: BasicBlock[]
+  parents: Set<BasicBlock>
   statements: ts.Node[]
   end: Transition
 };
+
+const invalidBB: BasicBlock = {
+  id: 'invalid',
+  parents: new Set(),
+  statements: [],
+  end: { kind: 'halt' },
+}
 
 export const forEachBasicBlock = (
   entry: BasicBlock,
@@ -100,6 +107,71 @@ export const printCfg = (entry: BasicBlock) => {
   return output
 }
 
+const setParents = (entry: BasicBlock) => {
+  forEachBasicBlock(entry, (block) => {
+    switch (block.end.kind) {
+      case 'jump': {
+        block.end.next.parents.add(block)
+      } break
+      case 'branch': {
+        block.end.then.parents.add(block)
+        block.end.else.parents.add(block)
+      } break
+    }
+  })
+  return entry
+}
+
+const validateParents = (entry: BasicBlock) => {
+  forEachBasicBlock(entry, (block) => {
+    switch (block.end.kind) {
+      case 'jump': {
+        if (!block.end.next.parents.has(block)) {
+          console.error(`Block ${block.end.next.id} (jump) missing parent ${block.id}`)
+        }
+      } break
+      case 'branch': {
+        if (!block.end.then.parents.has(block)) {
+          console.error(`Block ${block.end.then.id} (then) missing parent ${block.id}`)
+        }
+        if (!block.end.else.parents.has(block)) {
+          console.error(`Block ${block.end.else.id} (else) missing parent ${block.id}`)
+        }
+      } break
+    }
+  })
+  return entry
+}
+
+const eliminateEmptyJumps = (entry: BasicBlock) => {
+  forEachBasicBlock(entry, (block) => {
+    if (block.statements.length != 0 || block.end.kind != 'jump') {
+      return
+    }
+    const next = block.end.next
+
+    block.parents.forEach((parent) => {
+      next.parents.delete(block)
+      next.parents.add(parent)
+      switch (parent.end.kind) {
+        case 'branch': {
+          if (parent.end.then == block) {
+            parent.end.then = next
+          }
+          if (parent.end.else == block) {
+            parent.end.else = next
+          }
+        } break
+        case 'jump': {
+          parent.end.next = next
+        } break
+      }
+    })
+  })
+
+  return entry
+}
+
 export const cfg = (node: ts.SourceFile): BasicBlock => {
   let id = 0
 
@@ -111,7 +183,7 @@ export const cfg = (node: ts.SourceFile): BasicBlock => {
   const newBasicBlock = (prefix: string) => {
     return {
       id: newName(prefix),
-      parents: [],
+      parents: new Set(),
       statements: [],
       end: { kind: 'halt' },
     } as BasicBlock
@@ -135,19 +207,18 @@ export const cfg = (node: ts.SourceFile): BasicBlock => {
 
         const thenBlock: BasicBlock = {
           id: newName('then'),
-          parents: [parent],
+          parents: new Set(),
           statements: [],
           end: { kind: 'jump', next },
         }
 
         const elseBlock: BasicBlock = {
           id: newName('else'),
-          parents: [parent],
+          parents: new Set(),
           statements: [],
           end: { kind: 'jump', next },
         }
 
-        next.parents.push(thenBlock, elseBlock)
         parent.end = {
           kind: `branch`,
           condition: statement.expression,
@@ -173,7 +244,7 @@ export const cfg = (node: ts.SourceFile): BasicBlock => {
 
         const body: BasicBlock = {
           id: newName('while'),
-          parents: [parent],
+          parents: new Set(),
           statements: [],
           end: {
             kind: 'branch',
@@ -185,10 +256,8 @@ export const cfg = (node: ts.SourceFile): BasicBlock => {
         {
           const end = body.end as Branch
           end.then = body
-          body.parents.push(body)
         }
 
-        next.parents.push(body, parent)
         parent.end = {
           kind: 'branch',
           condition: statement.expression,
@@ -209,7 +278,7 @@ export const cfg = (node: ts.SourceFile): BasicBlock => {
 
         const body: BasicBlock = {
           id: newName('dowhile'),
-          parents: [parent],
+          parents: new Set([parent]),
           statements: [],
           end: {
             kind: 'branch',
@@ -221,10 +290,11 @@ export const cfg = (node: ts.SourceFile): BasicBlock => {
         {
           const end = body.end as Branch
           end.then = body
-          body.parents.push(body)
+          body.parents.add(body)
         }
 
-        next.parents.push(body, parent)
+        next.parents.add(body)
+        next.parents.add(parent)
         parent.end = { kind: 'jump', next: body }
 
         {
@@ -245,5 +315,11 @@ export const cfg = (node: ts.SourceFile): BasicBlock => {
 
   visit(node)
 
-  return entry
+  let result = entry
+  result = setParents(result)
+  result = validateParents(result)
+  result = eliminateEmptyJumps(result)
+  result = validateParents(result)
+
+  return result
 }
