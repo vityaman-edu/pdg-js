@@ -65,7 +65,7 @@ export const toStringStatements = (statements: ts.Node[]) => {
   return output
 }
 
-export const toString = (block: BasicBlock) => {
+export const toStringBB = (block: BasicBlock) => {
   let output = ''
 
   output += `${block.id}:\n`
@@ -92,15 +92,15 @@ export const toString = (block: BasicBlock) => {
   return output
 }
 
-export const printBasicBlocks = (entry: BasicBlock) => {
+export const printCfg = (entry: BasicBlock) => {
   let output = ''
   forEachBasicBlock(entry, (block: BasicBlock) => {
-    output += toString(block)
+    output += toStringBB(block)
   })
   return output
 }
 
-export const basicBlocks = (node: ts.SourceFile): BasicBlock => {
+export const cfg = (node: ts.SourceFile): BasicBlock => {
   let id = 0
 
   const newName = (prefix: string) => {

@@ -1,5 +1,5 @@
 import * as ts from 'typescript'
-import { basicBlocks, type BasicBlock } from './bb'
+import { cfg, type BasicBlock } from './cfg'
 
 export const play = (source: string): BasicBlock => {
   const file = ts.createSourceFile(
@@ -10,5 +10,5 @@ export const play = (source: string): BasicBlock => {
     ts.ScriptKind.TS,
   )
 
-  return basicBlocks(file)
+  return cfg(file)
 }

@@ -1,12 +1,12 @@
 import { Background, type Edge, Handle, MarkerType, type Node, Position, ReactFlow, ReactFlowProvider, useEdgesState, useNodesInitialized, useNodesState } from '@xyflow/react'
 import { Editor } from '@monaco-editor/react'
-import { SmartBezierEdge } from '@tisoap/react-flow-smart-edge';
+import { SmartBezierEdge } from '@tisoap/react-flow-smart-edge'
+import { useEffect, useState } from 'react'
 import '@xyflow/react/dist/style.css'
 import './App.css'
-import { forEachBasicBlock, type BasicBlock, toStringStatements } from '../pdg/bb'
+import { forEachBasicBlock, type BasicBlock, toStringStatements } from '../pdg/cfg'
 import { play } from '../pdg/playground'
 import { layout } from './Layout'
-import { useEffect, useState } from 'react'
 
 interface NodeData {
   label: string
