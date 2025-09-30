@@ -25,13 +25,6 @@ export interface BasicBlock {
   end: Transition
 };
 
-const invalidBB: BasicBlock = {
-  id: 'invalid',
-  parents: new Set(),
-  statements: [],
-  end: { kind: 'halt' },
-}
-
 export const forEachBasicBlock = (
   entry: BasicBlock,
   visit: (block: BasicBlock) => void,
