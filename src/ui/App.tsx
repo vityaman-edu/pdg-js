@@ -4,7 +4,7 @@ import { SmartBezierEdge } from '@tisoap/react-flow-smart-edge'
 import { useEffect, useState } from 'react'
 import '@xyflow/react/dist/style.css'
 import './App.css'
-import { forEachBasicBlock, type BasicBlock, toStringStatements } from '../pdg/cfg'
+import { forEachBasicBlock, type BasicBlock, toStringStatements, printCfg } from '../pdg/cfg'
 import { play } from '../pdg/playground'
 import { layout } from './Layout'
 
@@ -104,9 +104,7 @@ const MultilineNode = ({ data }: { data: NodeData }) => {
   )
 }
 
-const toGraph = (source: string) => {
-  const entry = play(source)
-
+const toGraph = (entry: BasicBlock) => {
   let id = 1
   const newId = () => {
     id += 1
@@ -211,8 +209,14 @@ export const App = () => {
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-arguments
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
 
+  const [cfgText, setCfgText] = useState('')
+
   const onSourceChange = (source: string) => {
-    const { nodes, edges } = toGraph(source)
+    const cfg = play(source)
+
+    setCfgText(printCfg(cfg))
+
+    const { nodes, edges } = toGraph(cfg)
     setNodes(nodes)
     setEdges(edges)
   }
@@ -274,6 +278,20 @@ export const App = () => {
         <ReactFlowProvider>
           <LayoutFlow />
         </ReactFlowProvider>
+      </div>
+      <div className="content-container" style={{ height: '86vh', width: '90vh' }}>
+        <h2>Control Flow Graph (Text)</h2>
+        <div
+          style={{
+            padding: '12px',
+            fontSize: 13,
+            fontFamily: 'monospace',
+            whiteSpace: 'pre-wrap',
+            lineHeight: 1.4,
+          }}
+        >
+          {cfgText}
+        </div>
       </div>
     </div>
   )
