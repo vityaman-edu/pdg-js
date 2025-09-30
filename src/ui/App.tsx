@@ -4,9 +4,11 @@ import { SmartBezierEdge } from '@tisoap/react-flow-smart-edge'
 import { useEffect, useState } from 'react'
 import '@xyflow/react/dist/style.css'
 import './App.css'
-import { forEachBasicBlock, type BasicBlock, toStringStatements, printCfg } from '../pdg/cfg'
-import { parse } from '../pdg/playground'
+import { parse } from '../ts/parse'
 import { layout } from './Layout'
+import { forEachBasicBlock, type BasicBlock } from '../cfg/core'
+import { printCfg, toStringStatements } from '../cfg/text'
+import { buildCfg } from '../cfg/build'
 
 interface NodeData {
   label: string
@@ -212,9 +214,11 @@ export const App = () => {
   const [cfgText, setCfgText] = useState('')
 
   const onSourceChange = (source: string) => {
-    const cfg = parse(source)
+    const ast = parse(source)
+    const cfg = buildCfg(ast)
 
-    setCfgText(printCfg(cfg))
+    const text = printCfg(cfg)
+    setCfgText(text)
 
     const { nodes, edges } = toGraph(cfg)
     setNodes(nodes)
