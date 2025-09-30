@@ -1,7 +1,7 @@
 import * as ts from 'typescript'
 import { cfg, type BasicBlock } from './cfg'
 
-export const play = (source: string): BasicBlock => {
+export const parse = (source: string): BasicBlock => {
   const file = ts.createSourceFile(
     'source.ts',
     source,

@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import '@xyflow/react/dist/style.css'
 import './App.css'
 import { forEachBasicBlock, type BasicBlock, toStringStatements, printCfg } from '../pdg/cfg'
-import { play } from '../pdg/playground'
+import { parse } from '../pdg/playground'
 import { layout } from './Layout'
 
 interface NodeData {
@@ -212,7 +212,7 @@ export const App = () => {
   const [cfgText, setCfgText] = useState('')
 
   const onSourceChange = (source: string) => {
-    const cfg = play(source)
+    const cfg = parse(source)
 
     setCfgText(printCfg(cfg))
 
