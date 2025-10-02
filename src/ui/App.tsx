@@ -5,27 +5,29 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import '@xyflow/react/dist/style.css'
 import './App.css'
 import { examples } from './examples'
-import { parse } from '../ts/parse'
+import { buildAst } from '../ast/build'
 import { layout } from './Layout'
 import { MultilineNode } from './cfg/component'
 import { buildCfg } from '../cfg/build'
 import { printCfg } from '../cfg/text'
 import { toGraph } from './cfg/graph'
+import { printAst } from '../ast/text'
 
 export const App = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-arguments
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
 
+  const [astText, setAstText] = useState('')
   const [cfgText, setCfgText] = useState('')
   const [content, setContent] = useState(examples['Hello World'])
 
   const onSourceChange = useCallback((source: string) => {
-    const ast = parse(source)
+    const ast = buildAst(source)
     const cfg = buildCfg(ast)
 
-    const text = printCfg(cfg)
-    setCfgText(text)
+    setAstText(printAst(ast))
+    setCfgText(printCfg(cfg))
 
     const { nodes, edges } = toGraph(cfg)
     setNodes(nodes)
@@ -129,6 +131,20 @@ export const App = () => {
             readOnly: true,
           }}
         />
+      </div>
+      <div className="content-container" style={{ height: '86vh', width: '90vh' }}>
+        <h2>Abstract Syntax Tree (Text)</h2>
+        <div
+          style={{
+            padding: '12px',
+            fontSize: 13,
+            fontFamily: 'monospace',
+            whiteSpace: 'pre-wrap',
+            lineHeight: 1.4,
+          }}
+        >
+          {astText}
+        </div>
       </div>
     </div>
   )

@@ -1,6 +1,6 @@
 import * as ts from 'typescript'
 
-export const parse = (source: string) => {
+export const buildAst = (source: string): ts.SourceFile => {
   return ts.createSourceFile(
     'source.ts',
     source,
