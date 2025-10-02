@@ -11,14 +11,6 @@ import { buildCfg } from '../cfg/build'
 import { printCfg } from '../cfg/text'
 import { toGraph } from './cfg/graph'
 
-const nodeTypes = {
-  multiline: MultilineNode,
-}
-
-const edgeTypes = {
-  smart: SmartBezierEdge,
-}
-
 export const App = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-arguments
@@ -61,8 +53,8 @@ export const App = () => {
           edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
-          nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes}
+          nodeTypes={{ multiline: MultilineNode }}
+          edgeTypes={{ smart: SmartBezierEdge }}
           fitView
         >
           <Background />
