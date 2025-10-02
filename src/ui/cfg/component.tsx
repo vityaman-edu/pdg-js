@@ -48,7 +48,7 @@ export const MultilineNode = ({ data }: { data: NodeData }) => {
         style={{
           backgroundColor: '#333',
           color: 'white',
-          padding: '8px 12px',
+          padding: '4px 4px',
           fontWeight: 'bold',
           fontSize: 14,
           textAlign: 'center',
@@ -59,7 +59,7 @@ export const MultilineNode = ({ data }: { data: NodeData }) => {
       { data.body && (
         <div
           style={{
-            padding: '12px',
+            padding: '4px',
             fontSize: 13,
             fontFamily: 'monospace',
             whiteSpace: 'pre-wrap',
@@ -74,7 +74,7 @@ export const MultilineNode = ({ data }: { data: NodeData }) => {
           style={{
             backgroundColor: getEndBackgroundColor(data),
             color: getEndTextColor(data),
-            padding: '8px 12px',
+            padding: '4px 4px',
             fontWeight: 'bold',
             fontSize: 14,
             borderTop: '1px solid #333',
