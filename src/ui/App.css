@@ -17,6 +17,22 @@
   border-right: 1px solid #ccc;
 }
 
+.editor-container h2 {
+  display: inline-block;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+.editor-container select {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  font-size: 14px;
+}
+
 .content-container {
   flex: 1;
   height: 100%;

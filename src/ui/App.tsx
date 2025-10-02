@@ -4,6 +4,7 @@ import { SmartBezierEdge } from '@tisoap/react-flow-smart-edge'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import '@xyflow/react/dist/style.css'
 import './App.css'
+import { examples } from './examples'
 import { parse } from '../ts/parse'
 import { layout } from './Layout'
 import { MultilineNode } from './cfg/component'
@@ -17,6 +18,7 @@ export const App = () => {
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
 
   const [cfgText, setCfgText] = useState('')
+  const [content, setContent] = useState(examples['Hello World'])
 
   const onSourceChange = useCallback((source: string) => {
     const ast = parse(source)
@@ -78,12 +80,23 @@ export const App = () => {
     <div className="app-container">
       <div className="editor-container" style={{ height: '80vh', width: '80vh' }}>
         <h2>Editor</h2>
+        <select
+          style={{ marginLeft: '10px' }}
+          onChange={(e) => {
+            setContent(examples[e.target.value] ?? '')
+          }}
+          defaultValue="Hello World"
+        >
+          {Object.entries(examples).map(entry => (
+            <option key={entry[0]} value={entry[0]}>{entry[0]}</option>
+          ))}
+        </select>
         <Editor
           defaultLanguage="typescript"
-          defaultValue="// some comment"
+          value={content}
           onChange={(value) => { onSourceChangeDebounced(value ?? '') }}
           options={{
-            fontSize: 22,
+            fontSize: 16,
             minimap: { enabled: false },
             scrollbar: {
               vertical: 'hidden',
@@ -91,6 +104,7 @@ export const App = () => {
             },
             overviewRulerLanes: 0,
           }}
+          onMount={() => { onSourceChange(content) }}
         />
       </div>
       <div className="content-container" style={{ height: '86vh', width: '90vh' }}>
