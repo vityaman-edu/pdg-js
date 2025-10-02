@@ -21,15 +21,15 @@ const validateParents = (entry: BasicBlock) => {
     switch (block.end.kind) {
       case 'jump': {
         if (!block.end.next.parents.has(block)) {
-          console.error(`Block ${block.end.next.id} (jump) missing parent ${block.id}`)
+          throw Error(`Block ${block.end.next.id} (jump) missing parent ${block.id}`)
         }
       } break
       case 'branch': {
         if (!block.end.then.parents.has(block)) {
-          console.error(`Block ${block.end.then.id} (then) missing parent ${block.id}`)
+          throw Error(`Block ${block.end.then.id} (then) missing parent ${block.id}`)
         }
         if (!block.end.else.parents.has(block)) {
-          console.error(`Block ${block.end.else.id} (else) missing parent ${block.id}`)
+          throw Error(`Block ${block.end.else.id} (else) missing parent ${block.id}`)
         }
       } break
     }
@@ -172,7 +172,7 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
 
         const body: BasicBlock = {
           id: newName('dowhile'),
-          parents: new Set([parent]),
+          parents: new Set([]),
           statements: [],
           end: {
             kind: 'branch',
@@ -184,11 +184,8 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
         {
           const end = body.end as Branch
           end.then = body
-          body.parents.add(body)
         }
 
-        next.parents.add(body)
-        next.parents.add(parent)
         parent.end = { kind: 'jump', next: body }
 
         {
