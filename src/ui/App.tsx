@@ -90,17 +90,20 @@ export const App = () => {
       </div>
       <div className="content-container" style={{ height: '86vh', width: '90vh' }}>
         <h2>Control Flow Graph (Text)</h2>
-        <div
-          style={{
-            padding: '12px',
-            fontSize: 13,
-            fontFamily: 'monospace',
-            whiteSpace: 'pre-wrap',
-            lineHeight: 1.4,
+        <Editor
+          defaultLanguage="typescript"
+          value={cfgText}
+          options={{
+            fontSize: 22,
+            minimap: { enabled: false },
+            scrollbar: {
+              vertical: 'hidden',
+              horizontal: 'hidden',
+            },
+            overviewRulerLanes: 0,
+            readOnly: true,
           }}
-        >
-          {cfgText}
-        </div>
+        />
       </div>
     </div>
   )
