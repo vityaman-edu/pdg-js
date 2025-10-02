@@ -1,7 +1,7 @@
 import { Background, type Edge, type Node, ReactFlow, ReactFlowProvider, useEdgesState, useNodesInitialized, useNodesState } from '@xyflow/react'
 import { Editor } from '@monaco-editor/react'
 import { SmartBezierEdge } from '@tisoap/react-flow-smart-edge'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import '@xyflow/react/dist/style.css'
 import './App.css'
 import { parse } from '../ts/parse'
@@ -18,7 +18,7 @@ export const App = () => {
 
   const [cfgText, setCfgText] = useState('')
 
-  const onSourceChange = (source: string) => {
+  const onSourceChange = useCallback((source: string) => {
     const ast = parse(source)
     const cfg = buildCfg(ast)
 
@@ -28,7 +28,18 @@ export const App = () => {
     const { nodes, edges } = toGraph(cfg)
     setNodes(nodes)
     setEdges(edges)
-  }
+  }, [setEdges, setNodes])
+
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const onSourceChangeDebounced = useCallback((source: string) => {
+    if (timer.current) {
+      clearTimeout(timer.current)
+    }
+
+    timer.current = setTimeout(() => {
+      onSourceChange(source)
+    }, 300)
+  }, [onSourceChange])
 
   const LayoutFlow = () => {
     const useLayout = () => {
@@ -70,7 +81,7 @@ export const App = () => {
         <Editor
           defaultLanguage="typescript"
           defaultValue="// some comment"
-          onChange={(value) => { onSourceChange(value ?? '') }}
+          onChange={(value) => { onSourceChangeDebounced(value ?? '') }}
           options={{
             fontSize: 22,
             minimap: { enabled: false },

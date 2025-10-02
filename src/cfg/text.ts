@@ -37,10 +37,12 @@ export const toStringBB = (block: BasicBlock) => {
 
 export const printCfg = (entry: BasicBlock) => {
   let output = ''
+  output += '{\n'
   output += `const jump = (label: string) => { }\n`
   output += '\n'
   forEachBasicBlock(entry, (block: BasicBlock) => {
     output += toStringBB(block)
   })
+  output += '}\n'
   return output
 }
