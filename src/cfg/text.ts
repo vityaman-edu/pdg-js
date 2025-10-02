@@ -13,22 +13,22 @@ export const toStringStatements = (statements: ts.Node[]) => {
 export const toStringBB = (block: BasicBlock) => {
   let output = ''
 
-  output += `${block.id}:\n`
+  output += `/* ${block.id}: */ \n`
   output += toStringStatements(block.statements)
 
   output += '  '
   const end = block.end
   switch (end.kind) {
     case 'halt': {
-      output += 'halt'
+      output += 'jump(\'halt\')'
     } break
     case 'jump': {
-      output += `jump to ${end.next.id}`
+      output += `jump('${end.next.id}')`
     } break
     case 'branch': {
       output += (
-        `jump if (${end.condition.getText()})`
-        + ` to ${end.then.id} else ${end.else.id}`
+        `if (${end.condition.getText()})`
+        + ` jump('${end.then.id}') else jump('${end.else.id}')`
       )
     } break
   }
@@ -39,6 +39,8 @@ export const toStringBB = (block: BasicBlock) => {
 
 export const printCfg = (entry: BasicBlock) => {
   let output = ''
+  output += `const jump = (label: string) => { }\n`
+  output += '\n'
   forEachBasicBlock(entry, (block: BasicBlock) => {
     output += toStringBB(block)
   })

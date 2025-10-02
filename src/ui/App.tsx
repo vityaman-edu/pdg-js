@@ -94,7 +94,7 @@ export const App = () => {
           defaultLanguage="typescript"
           value={cfgText}
           options={{
-            fontSize: 22,
+            fontSize: 16,
             minimap: { enabled: false },
             scrollbar: {
               vertical: 'hidden',
