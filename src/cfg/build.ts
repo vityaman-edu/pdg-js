@@ -134,12 +134,11 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
       }
       else if (ts.isWhileStatement(statement)) {
         const parent = current
+
         const next = { ...newBasicBlock('next'), end: parent.end }
 
-        const body: BasicBlock = {
-          id: newName('while'),
-          parents: new Set(),
-          statements: [],
+        const cond = {
+          ...newBasicBlock('while'),
           end: {
             kind: 'branch',
             condition: statement.expression,
@@ -147,17 +146,13 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
             else: next,
           },
         }
-        {
-          const end = body.end as Branch
-          end.then = body
-        }
+        parent.end = { kind: 'jump', next: cond as BasicBlock }
 
-        parent.end = {
-          kind: 'branch',
-          condition: statement.expression,
-          then: body,
-          else: next,
+        const body: BasicBlock = {
+          ...newBasicBlock('loop'),
+          end: { kind: 'jump', next: cond as BasicBlock },
         }
+        cond.end.then = body
 
         {
           current = body

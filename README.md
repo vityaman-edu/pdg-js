@@ -32,7 +32,7 @@ Program Dependence Graph for the TypeScript.
 
 ## Plan
 
-- [ ] `while` separate cond
+- [x] `while` separate cond
 - [ ] `for (decl; cond; step)`
 - [ ] `break` and `continue`
 - [ ] Data dependencies
