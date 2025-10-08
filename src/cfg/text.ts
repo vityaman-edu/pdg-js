@@ -17,8 +17,8 @@ export const toStringBB = (block: BasicBlock) => {
 
   const end = block.end
   switch (end.kind) {
-    case 'halt': {
-      output += 'jump(\'halt\')'
+    case 'return': {
+      output += 'return'
     } break
     case 'jump': {
       output += `jump('${end.next.id}')`

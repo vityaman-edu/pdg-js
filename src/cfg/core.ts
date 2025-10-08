@@ -1,7 +1,7 @@
 import * as ts from 'typescript'
 
-export interface Halt {
-  kind: 'halt'
+export interface Return {
+  kind: 'return'
 }
 
 export interface Jump {
@@ -16,7 +16,7 @@ export interface Branch {
   else: BasicBlock
 }
 
-export type Transition = Halt | Jump | Branch
+export type Transition = Return | Jump | Branch
 
 export interface BasicBlock {
   id: string

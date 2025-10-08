@@ -12,8 +12,8 @@ export const toGraph = (entry: BasicBlock) => {
   const newNode = (block: BasicBlock) => {
     let end = ''
     switch (block.end.kind) {
-      case 'halt': {
-        end = 'halt'
+      case 'return': {
+        end = 'return'
       } break
       case 'branch': {
         end = `if (${block.end.condition.getText()})`

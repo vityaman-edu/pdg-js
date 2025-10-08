@@ -7,7 +7,7 @@ interface NodeData {
 }
 
 const getEndBackgroundColor = (data: NodeData) => {
-  if (data.end.startsWith('halt')) {
+  if (data.end.startsWith('return')) {
     return '#dc3545'
   }
   else if (data.end.startsWith('if')) {
@@ -20,7 +20,7 @@ const getEndBackgroundColor = (data: NodeData) => {
 }
 
 const getEndTextColor = (data: NodeData) => {
-  if (data.end.startsWith('halt') || data.end.startsWith('if')) {
+  if (data.end.startsWith('return') || data.end.startsWith('if')) {
     return 'white'
   }
   return 'white'

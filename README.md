@@ -29,3 +29,10 @@ Program Dependence Graph for the TypeScript.
   2. Identifier
   3. BinaryExpression
 2. VariableDeclaration
+
+## Plan
+
+- [ ] `while` separate cond
+- [ ] `for (decl; cond; step)`
+- [ ] `break` and `continue`
+- [ ] Data dependencies

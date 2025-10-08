@@ -79,7 +79,7 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
       id: newName(prefix),
       parents: new Set(),
       statements: [],
-      end: { kind: 'halt' },
+      end: { kind: 'return' },
     } as BasicBlock
   }
 
