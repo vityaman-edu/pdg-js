@@ -82,7 +82,12 @@ const eliminateEmptyJumps = (entry: BasicBlock) => {
   return entry
 }
 
-export const buildCfg = (node: ts.SourceFile): BasicBlock => {
+// TODO: BuildCfgOptions
+export interface BuildCfgOptions {
+  areEmptyJumpsEliminated: boolean
+}
+
+export const buildCfg = (node: ts.SourceFile, options?: BuildCfgOptions): BasicBlock => {
   let id = 0
 
   const newName = (prefix: string) => {
@@ -318,8 +323,10 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
   let result = entry
   result = setParents(result)
   result = validate(result)
-  result = eliminateEmptyJumps(result)
-  result = validate(result)
+  if (options?.areEmptyJumpsEliminated ?? false) {
+    result = eliminateEmptyJumps(result)
+    result = validate(result)
+  }
 
   return result
 }

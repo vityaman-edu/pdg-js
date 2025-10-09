@@ -45,3 +45,29 @@
   white-space: pre-wrap;
   word-wrap: break-word;
 }
+
+.hover-container {
+  position: relative;
+  display: inline-block;
+}
+
+.hover-text {
+  visibility: hidden;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  position: absolute;
+  z-index: 1;
+}
+
+.hover-text::after {
+  content: "";
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+.hover-container:hover .hover-text {
+  visibility: visible;
+  opacity: 1;
+}

@@ -24,10 +24,11 @@ export const App = () => {
   const [astText, setAstText] = useState('')
   const [cfgText, setCfgText] = useState('')
   const [content, setContent] = useState(examples['Hello World'])
+  const [areEmptyJumpsEliminated, setAreEmptyJumpsEliminated] = useState(true)
 
   const onSourceChange = useCallback((source: string) => {
     const ast = buildAst(source)
-    const cfg = buildCfg(ast)
+    const cfg = buildCfg(ast, { areEmptyJumpsEliminated })
 
     setAstText(printAst(ast))
     setCfgText(printCfg(cfg))
@@ -35,7 +36,7 @@ export const App = () => {
     const { nodes, edges } = toGraph(cfg)
     setNodes(nodes)
     setEdges(edges)
-  }, [setEdges, setNodes])
+  }, [areEmptyJumpsEliminated, setEdges, setNodes])
 
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const onSourceChangeDebounced = useCallback((source: string) => {
@@ -106,6 +107,19 @@ export const App = () => {
             <option key={entry[0]} value={entry[0]}>{entry[0]}</option>
           ))}
         </select>
+        <div className="hover-container">
+          <input
+            className="hover-input"
+            type="checkbox"
+            checked={areEmptyJumpsEliminated}
+            onChange={(e) => {
+              setAreEmptyJumpsEliminated(e.target.checked)
+              onSourceChange(content)
+            }}
+          />
+          <span className="hover-text">Eliminate Empty Jumps</span>
+        </div>
+        <input type="checkbox" />
         <Editor
           defaultLanguage="typescript"
           value={content}
