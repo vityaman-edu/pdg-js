@@ -14,6 +14,7 @@ import { toGraph } from './cfg/graph'
 import { printAst } from '../ast/text'
 
 export const App = () => {
+  const isCfgTextEnabled = false
   const isASTEnabled = false
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
@@ -119,23 +120,28 @@ export const App = () => {
           <LayoutFlow />
         </ReactFlowProvider>
       </div>
-      <div className="content-container" style={{ height: '86vh', width: '90vh' }}>
-        <h2>Control Flow Graph (Text)</h2>
-        <Editor
-          defaultLanguage="typescript"
-          value={cfgText}
-          options={{
-            fontSize: 16,
-            minimap: { enabled: false },
-            scrollbar: {
-              vertical: 'hidden',
-              horizontal: 'hidden',
-            },
-            overviewRulerLanes: 0,
-            readOnly: true,
-          }}
-        />
-      </div>
+      {// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        isCfgTextEnabled
+        && (
+          <div className="content-container" style={{ height: '86vh', width: '90vh' }}>
+            <h2>Control Flow Graph (Text)</h2>
+            <Editor
+              defaultLanguage="typescript"
+              value={cfgText}
+              options={{
+                fontSize: 16,
+                minimap: { enabled: false },
+                scrollbar: {
+                  vertical: 'hidden',
+                  horizontal: 'hidden',
+                },
+                overviewRulerLanes: 0,
+                readOnly: true,
+              }}
+            />
+          </div>
+        )
+      }
 
       {// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         isASTEnabled && (
