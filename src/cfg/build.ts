@@ -125,7 +125,7 @@ const mergeJumpChains = (entry: BasicBlock) => {
       } break
       case 'jump': {
         const target = next.end.next
-        next.parents.remove(next)
+        target.parents.remove(next)
         target.parents.add(block)
       } break
     }
@@ -415,8 +415,11 @@ export const buildCfg = (node: ts.SourceFile, options?: BuildCfgOptions): BasicB
   }
 
   if (options?.areJumpChainsMerged ?? true) {
-    result = mergeJumpChains(result)
-    result = validate(result)
+    for (let i = 0; i < 8; ++i) {
+      console.log(i)
+      result = mergeJumpChains(result)
+      result = validate(result)
+    }
   }
 
   return result
