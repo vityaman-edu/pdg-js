@@ -134,7 +134,7 @@ export const App = () => {
             },
             overviewRulerLanes: 0,
           }}
-          onMount={() => { onSourceChange(content) }}
+          onMount={() => { onSourceChange(content, areEmptyJumpsEliminated) }}
         />
       </div>
       <div className="content-container" style={{ height: '86vh', width: '90vh' }}>

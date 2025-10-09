@@ -301,6 +301,18 @@ export const buildCfg = (node: ts.SourceFile, options?: BuildCfgOptions): BasicB
 
       current = dead
     }
+    else if (ts.isReturnStatement(statement)) {
+      const dead = { ...newBasicBlock('returndead'), end: current.end }
+
+      current.end = {
+        kind: 'branch',
+        condition: ts.factory.createTrue(),
+        then: newBasicBlock('return'),
+        else: dead,
+      }
+
+      current = dead
+    }
     else if (statement.kind == ts.SyntaxKind.EndOfFileToken) {
       return
     }
@@ -310,6 +322,17 @@ export const buildCfg = (node: ts.SourceFile, options?: BuildCfgOptions): BasicB
   }
 
   const visit = (node: ts.Node) => {
+    if (ts.isSourceFile(node)
+      && node.statements.length == 1
+      && ts.isFunctionDeclaration(node.statements[0])) {
+      if (node.statements[0].body == undefined) {
+        throw Error(`Empty function body`)
+      }
+
+      visit(node.statements[0].body)
+      return
+    }
+
     if (ts.isBlock(node) || ts.isSourceFile(node)) {
       node.forEachChild(visitStatement)
       return

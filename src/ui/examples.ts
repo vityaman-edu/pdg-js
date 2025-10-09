@@ -7,7 +7,7 @@ console.log('Sorry, I have a boyfriend.')
   'Fibonacci': `
 let ans = 1
 if (n < 0) {
-  ans = "Input must be a non-negative integer.";
+  return
 }
 if (n === 0) {
     ans =  0;
@@ -221,4 +221,22 @@ for (let i = 0; i < 10; i++) {
 }
 `,
 
+  /*
+      x, y, z
+      /     \
+    x = y  x = z
+      \      /
+       log(x)
+  */
+  'Data Dependency If': `
+let x = 1
+let y = 1
+let z = 1
+if (x == 1) {
+  x = y
+} else {
+  x = z
+}
+console.log(x)
+`,
 }
