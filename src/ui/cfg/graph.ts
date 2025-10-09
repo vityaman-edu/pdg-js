@@ -1,6 +1,6 @@
 import { type Edge, MarkerType, type Node } from '@xyflow/react'
 import { forEachBasicBlock, type BasicBlock } from '../../cfg/core'
-import { toStringStatements } from '../../cfg/text'
+import { toStringExpr, toStringStatements } from '../../cfg/text'
 
 export const toGraph = (entry: BasicBlock) => {
   let id = 1
@@ -16,7 +16,7 @@ export const toGraph = (entry: BasicBlock) => {
         end = 'return'
       } break
       case 'branch': {
-        end = `if (${block.end.condition.getText()})`
+        end = `if (${toStringExpr(block.end.condition)})`
       } break
       case 'jump': {
         end = 'jump'

@@ -1,6 +1,13 @@
 import * as ts from 'typescript'
 import { type BasicBlock, forEachBasicBlock } from './core'
 
+export const toStringExpr = (expr: ts.Expression) => {
+  if (expr.kind == ts.SyntaxKind.TrueKeyword) {
+    return 'true'
+  }
+  return expr.getText()
+}
+
 export const toStringStatements = (statements: ts.Node[]) => {
   let output = ''
   for (const statement of statements) {
@@ -25,7 +32,7 @@ export const toStringBB = (block: BasicBlock) => {
     } break
     case 'branch': {
       output += (
-        `if (${end.condition.getText()})`
+        `if (${toStringExpr(end.condition)})`
         + ` jump('${end.then.id}') else jump('${end.else.id}')`
       )
     } break

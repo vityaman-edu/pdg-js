@@ -33,16 +33,19 @@ ans =  b;
   'If Statement': `
 let x = 2
 
+console.log('if {}')
 if (x % 2 == 0) {
   console.log(\`\${x} is even\`)
 }
 
+console.log('if {} else {}')
 if (x % 2 == 0) {
   console.log(\`\${x} is even\`)
 } else {
   console.log(\`\${x} is odd\`)
 }
 
+console.log('if {} else if {}')
 if (x % 3 == 0) {
   console.log(0)
 } else if (x % 3 == 1) {
@@ -51,6 +54,7 @@ if (x % 3 == 0) {
   console.log(2)
 }
 
+console.log('if {} else if {} else {}')
 if (x % 4 == 1) {
   console.log(1)
 } else if (x % 4 == 2) {
@@ -64,18 +68,53 @@ if (x % 4 == 1) {
 
   'Loop': `
 let x = 1
+
+console.log('while {}')
 while (x < 10) {
   x += 1
 }
 
+console.log('do {} while')
 do {
   x -= 1
 } while (x > 0)
 
-for (;;) {
+console.log('for 0 0 0')
+for (/*     */; /*  */; /* */) {
   console.log('Yes')
 }
 
+console.log('for 1 0 0')
+for (let i = 0; /*  */; /* */) {
+  console.log(\`i = \${i}\`)
+}
+
+console.log('for 0 1 0')
+for (/*     */; x < 10; /* */) {
+  console.log(\`x = \${x}\`)
+}
+
+console.log('for 1 1 0')
+for (let i = 0; i < 10; /* */) {
+  console.log(\`x = \${x}\`)
+}
+
+console.log('for 0 0 1')
+for (/*     */; /*  */; x++) {
+  console.log(\`x = \${x}\`)
+}
+
+console.log('for 1 0 1')
+for (let i = 0; /*  */; i++) {
+  console.log(\`i = \${i}\`)
+}
+
+console.log('for 0 1 1')
+for (/*     */; x < 10; x++) {
+  console.log(\`x = \${x}\`)
+}
+
+console.log('for 1 1 1')
 for (let i = 0; i < 10; i++) {
   console.log(\`i = \${i}\`)
 }

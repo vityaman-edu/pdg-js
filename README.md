@@ -35,4 +35,5 @@ Program Dependence Graph for the TypeScript.
 - [x] `while` separate cond
 - [ ] `for (decl; cond; step)`
 - [ ] `break` and `continue`
+- [ ] `if {} else if {} else {}`
 - [ ] Data dependencies

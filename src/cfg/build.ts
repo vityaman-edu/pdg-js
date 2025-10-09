@@ -1,5 +1,5 @@
 import * as ts from 'typescript'
-import { type BasicBlock, type Branch, forEachBasicBlock } from './core'
+import { type BasicBlock, type Branch, forEachBasicBlock, invalidBasicBlock, invalidTransition } from './core'
 
 const setParents = (entry: BasicBlock) => {
   forEachBasicBlock(entry, (block) => {
@@ -138,18 +138,18 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
         const next = { ...newBasicBlock('next'), end: parent.end }
 
         const cond = {
-          ...newBasicBlock('while'),
+          ...newBasicBlock('whilecond'),
           end: {
             kind: 'branch',
             condition: statement.expression,
-            then: next,
+            then: invalidBasicBlock(),
             else: next,
           },
         }
         parent.end = { kind: 'jump', next: cond as BasicBlock }
 
         const body: BasicBlock = {
-          ...newBasicBlock('loop'),
+          ...newBasicBlock('whilebody'),
           end: { kind: 'jump', next: cond as BasicBlock },
         }
         cond.end.then = body
@@ -191,7 +191,53 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
         current = next
       }
       else if (ts.isForStatement(statement)) {
-        throw new Error('Not implemented')
+        const parent = current
+
+        const next = { ...newBasicBlock('next'), end: parent.end }
+
+        const initializer: BasicBlock = {
+          ...newBasicBlock('forinit'),
+          statements: (statement.initializer != null ? [statement.initializer] : []),
+          end: invalidTransition(),
+        }
+        parent.end = { kind: 'jump', next: initializer }
+
+        const condition: BasicBlock = {
+          ...newBasicBlock('forcond'),
+          end: {
+            kind: 'branch',
+            condition: statement.condition ?? ts.factory.createTrue(),
+            then: invalidBasicBlock(),
+            else: invalidBasicBlock(),
+          },
+        }
+        initializer.end = { kind: 'jump', next: condition }
+
+        const body: BasicBlock = {
+          ...newBasicBlock('forbody'),
+          end: invalidTransition(),
+        }
+        {
+          const end = condition.end as Branch
+          end.then = body
+          end.else = next
+        }
+        {
+          current = body
+          visit(statement.statement)
+        }
+
+        const incrementor: BasicBlock = {
+          ...newBasicBlock('forinc'),
+          statements: statement.incrementor != null ? [statement.incrementor] : [],
+          end: {
+            kind: 'jump',
+            next: condition,
+          },
+        }
+        body.end = { kind: 'jump', next: incrementor }
+
+        current = next
       }
       else if (ts.isForInStatement(statement)) {
         throw new Error('Not implemented')

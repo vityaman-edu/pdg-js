@@ -32,7 +32,7 @@ export const forEachBasicBlock = (
   const visited: BasicBlock[] = []
   const queue = [entry]
 
-  for (;;) {
+  for (; ;) {
     const block = queue.shift()
     if (block == undefined) {
       break
@@ -54,4 +54,17 @@ export const forEachBasicBlock = (
       } break
     }
   }
+}
+
+export const invalidBasicBlock = () => {
+  return {
+    id: 'invalid',
+    parents: new Set(),
+    statements: [],
+    end: { kind: 'return' },
+  } as BasicBlock
+}
+
+export const invalidTransition = () => {
+  return { kind: 'jump', next: invalidBasicBlock() } as Transition
 }
