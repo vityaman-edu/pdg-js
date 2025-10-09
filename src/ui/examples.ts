@@ -119,4 +119,20 @@ for (let i = 0; i < 10; i++) {
   console.log(\`i = \${i}\`)
 }
 `,
+
+  'Break / Continue': `
+console.log('break')
+while (true) {
+  console.log('begin')
+  break
+  console.log('end')
+}
+
+console.log('continue')
+while (true) {
+  console.log('begin')
+  continue
+  console.log('end')
+}
+`,
 }

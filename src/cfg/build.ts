@@ -85,17 +85,12 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
 
   const entry = newBasicBlock('start')
 
+  const loopNexts: BasicBlock[] = []
   let current = entry
 
   const visit = (node: ts.Node) => {
     node.forEachChild((statement) => {
-      if (ts.isVariableStatement(statement)) {
-        current.statements.push(statement)
-      }
-      else if (ts.isExpressionStatement(statement)) {
-        current.statements.push(statement)
-      }
-      else if (ts.isIfStatement(statement)) {
+      if (ts.isIfStatement(statement)) {
         const parent = current
         const next = { ...newBasicBlock('next'), end: parent.end }
 
@@ -136,6 +131,7 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
         const parent = current
 
         const next = { ...newBasicBlock('next'), end: parent.end }
+        loopNexts.push(next)
 
         const cond = {
           ...newBasicBlock('whilecond'),
@@ -159,11 +155,14 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
           visit(statement.statement)
         }
 
+        loopNexts.pop()
         current = next
       }
       else if (ts.isDoStatement(statement)) {
         const parent = current
+
         const next = { ...newBasicBlock('next'), end: parent.end }
+        loopNexts.push(next)
 
         const body: BasicBlock = {
           id: newName('dowhile'),
@@ -188,12 +187,14 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
           visit(statement.statement)
         }
 
+        loopNexts.pop()
         current = next
       }
       else if (ts.isForStatement(statement)) {
         const parent = current
 
         const next = { ...newBasicBlock('next'), end: parent.end }
+        loopNexts.push(next)
 
         const initializer: BasicBlock = {
           ...newBasicBlock('forinit'),
@@ -237,10 +238,28 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
         }
         body.end = { kind: 'jump', next: incrementor }
 
+        loopNexts.pop()
         current = next
       }
-      else if (ts.isForInStatement(statement)) {
-        throw new Error('Not implemented')
+      else if (ts.isBreakStatement(statement)) {
+        if (loopNexts.length == 0) {
+          throw new Error('No enclosing loop')
+        }
+
+        const loopNext = loopNexts[loopNexts.length - 1]
+        const dead = { ...newBasicBlock('breakdead'), end: current.end }
+
+        current.end = {
+          kind: 'branch',
+          condition: ts.factory.createTrue(),
+          then: loopNext,
+          else: dead,
+        }
+
+        current = dead
+      }
+      else {
+        current.statements.push(statement)
       }
     })
   }
