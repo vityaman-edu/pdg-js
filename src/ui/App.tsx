@@ -14,6 +14,8 @@ import { toGraph } from './cfg/graph'
 import { printAst } from '../ast/text'
 
 export const App = () => {
+  const isASTEnabled = false
+
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-arguments
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
@@ -132,20 +134,25 @@ export const App = () => {
           }}
         />
       </div>
-      <div className="content-container" style={{ height: '86vh', width: '90vh' }}>
-        <h2>Abstract Syntax Tree (Text)</h2>
-        <div
-          style={{
-            padding: '12px',
-            fontSize: 13,
-            fontFamily: 'monospace',
-            whiteSpace: 'pre-wrap',
-            lineHeight: 1.4,
-          }}
-        >
-          {astText}
-        </div>
-      </div>
+
+      {// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        isASTEnabled && (
+          <div className="content-container" style={{ height: '86vh', width: '90vh' }}>
+            <h2>Abstract Syntax Tree (Text)</h2>
+            <div
+              style={{
+                padding: '12px',
+                fontSize: 13,
+                fontFamily: 'monospace',
+                whiteSpace: 'pre-wrap',
+                lineHeight: 1.4,
+              }}
+            >
+              {astText}
+            </div>
+          </div>
+        )
+      }
     </div>
   )
 }
