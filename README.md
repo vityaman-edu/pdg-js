@@ -36,6 +36,6 @@ Program Dependence Graph for the TypeScript.
 - [x] `for (decl; cond; step)`
 - [x] `break` and `continue`
 - [ ] Separate tests
-- [ ] Refresh on test choice
+- [x] Refresh on test choice
 - [ ] `if {} else if {} else {}`
 - [ ] Data dependencies

@@ -87,7 +87,9 @@ export const App = () => {
         <select
           style={{ marginLeft: '10px' }}
           onChange={(e) => {
-            setContent(examples[e.target.value] ?? '')
+            const source = examples[e.target.value] ?? ''
+            setContent(source)
+            onSourceChange(source)
           }}
           defaultValue="Hello World"
         >
