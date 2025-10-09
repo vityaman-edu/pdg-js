@@ -55,9 +55,12 @@ const validate = (entry: BasicBlock) => {
 
 const eliminateEmptyJumps = (entry: BasicBlock) => {
   forEachBasicBlock(entry, (block) => {
-    if (block.statements.length != 0 || block.end.kind != 'jump') {
+    if (block.statements.length != 0
+      || block.end.kind != 'jump'
+      || block == block.end.next) {
       return
     }
+
     const next = block.end.next
 
     block.parents.forEach((parent) => {
@@ -84,13 +87,14 @@ const eliminateEmptyJumps = (entry: BasicBlock) => {
 
 const eliminateIfTrue = (entry: BasicBlock) => {
   forEachBasicBlock(entry, (block) => {
-    if (block.end.kind != 'branch'
-      || ts.isLiteralExpression(block.end.condition)
-      || block.end.condition.kind != ts.SyntaxKind.TrueKeyword) {
+    const end = block.end
+    if (end.kind != 'branch'
+      || ts.isLiteralExpression(end.condition)
+      || end.condition.kind != ts.SyntaxKind.TrueKeyword) {
       return
     }
 
-    block.end = { kind: 'jump', next: block.end.then }
+    block.end = { kind: 'jump', next: end.then }
   })
   return entry
 }
@@ -363,13 +367,12 @@ export const buildCfg = (node: ts.SourceFile, options?: BuildCfgOptions): BasicB
 
   let result = entry
 
-  result = setParents(result)
-  result = validate(result)
-
   if (options?.areIfTrueEliminated ?? true) {
     result = eliminateIfTrue(result)
-    result = validate(result)
   }
+
+  result = setParents(result)
+  result = validate(result)
 
   if (options?.areEmptyJumpsEliminated ?? true) {
     result = eliminateEmptyJumps(result)

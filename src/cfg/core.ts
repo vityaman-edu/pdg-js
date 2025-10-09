@@ -1,3 +1,4 @@
+import type { MultiSet } from 'mnemonist'
 import * as ts from 'typescript'
 
 export interface Return {
@@ -21,7 +22,7 @@ export type Transition = Return | Jump | Branch
 
 export interface BasicBlock {
   id: string
-  parents: Set<BasicBlock>
+  parents: MultiSet<BasicBlock>
   statements: ts.Node[]
   end: Transition
 }

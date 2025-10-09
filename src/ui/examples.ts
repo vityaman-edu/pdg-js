@@ -236,4 +236,11 @@ if (x == 1) {
 }
 console.log(x)
 `,
+
+  'While (True) While (True)': `
+while (true) {
+  while (true) {
+  }
+}
+`,
 }
