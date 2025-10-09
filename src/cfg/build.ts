@@ -37,6 +37,22 @@ const validateParents = (entry: BasicBlock) => {
   return entry
 }
 
+const validateNodes = (entry: BasicBlock) => {
+  const invalid = invalidBasicBlock()
+  forEachBasicBlock(entry, (block) => {
+    if (block == invalid) {
+      throw Error(`Found an invalid block`)
+    }
+  })
+  return entry
+}
+
+const validate = (entry: BasicBlock) => {
+  entry = validateNodes(entry)
+  entry = validateParents(entry)
+  return entry
+}
+
 const eliminateEmptyJumps = (entry: BasicBlock) => {
   forEachBasicBlock(entry, (block) => {
     if (block.statements.length != 0 || block.end.kind != 'jump') {
@@ -295,9 +311,9 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
 
   let result = entry
   result = setParents(result)
-  result = validateParents(result)
-  // result = eliminateEmptyJumps(result)
-  result = validateParents(result)
+  result = validate(result)
+  result = eliminateEmptyJumps(result)
+  result = validate(result)
 
   return result
 }
