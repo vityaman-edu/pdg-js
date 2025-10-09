@@ -39,3 +39,5 @@ Program Dependence Graph for the TypeScript.
 - [x] Refresh on test choice
 - [x] `if {} else if {} else {}`
 - [ ] Data dependencies
+- [ ] Merge Basic Blocks
+- [ ] Support exceptions

@@ -26,16 +26,19 @@ export const App = () => {
   const [content, setContent] = useState(examples['Hello World'])
   const [areEmptyJumpsEliminated, setAreEmptyJumpsEliminated] = useState(true)
   const [areIfTrueEliminated, setIfTrueEliminated] = useState(true)
+  const [areJumpChainsMerged, setJumpChainsMerged] = useState(true)
 
   const onSourceChange = useCallback((
     source: string,
     areEmptyJumpsEliminated: boolean,
     areIfTrueEliminated: boolean,
+    areJumpChainsMerged: boolean,
   ) => {
     const ast = buildAst(source)
     const cfg = buildCfg(ast, {
       areEmptyJumpsEliminated,
       areIfTrueEliminated,
+      areJumpChainsMerged,
     })
 
     setAstText(printAst(ast))
@@ -53,9 +56,14 @@ export const App = () => {
     }
 
     timer.current = setTimeout(() => {
-      onSourceChange(source, areEmptyJumpsEliminated, areIfTrueEliminated)
+      onSourceChange(
+        source,
+        areEmptyJumpsEliminated,
+        areIfTrueEliminated,
+        areJumpChainsMerged,
+      )
     }, 300)
-  }, [areEmptyJumpsEliminated, areIfTrueEliminated, onSourceChange])
+  }, [areEmptyJumpsEliminated, areIfTrueEliminated, areJumpChainsMerged, onSourceChange])
 
   const LayoutFlow = () => {
     const useLayout = () => {
@@ -107,7 +115,12 @@ export const App = () => {
           onChange={(e) => {
             const source = examples[e.target.value] ?? ''
             setContent(source)
-            onSourceChange(source, areEmptyJumpsEliminated, areIfTrueEliminated)
+            onSourceChange(
+              source,
+              areEmptyJumpsEliminated,
+              areIfTrueEliminated,
+              areJumpChainsMerged,
+            )
           }}
           defaultValue="Hello World"
         >
@@ -123,7 +136,12 @@ export const App = () => {
             onChange={(e) => {
               const areEmptyJumpsEliminated = e.target.checked
               setAreEmptyJumpsEliminated(areEmptyJumpsEliminated)
-              onSourceChange(content, areEmptyJumpsEliminated, areIfTrueEliminated)
+              onSourceChange(
+                content,
+                areEmptyJumpsEliminated,
+                areIfTrueEliminated,
+                areJumpChainsMerged,
+              )
             }}
           />
           <span className="hover-text">Eliminate Empty Jumps</span>
@@ -136,10 +154,33 @@ export const App = () => {
             onChange={(e) => {
               const areIfTrueEliminated = e.target.checked
               setIfTrueEliminated(areIfTrueEliminated)
-              onSourceChange(content, areEmptyJumpsEliminated, areIfTrueEliminated)
+              onSourceChange(
+                content,
+                areEmptyJumpsEliminated,
+                areIfTrueEliminated,
+                areJumpChainsMerged,
+              )
             }}
           />
           <span className="hover-text">Eliminate If True</span>
+        </div>
+        <div className="hover-container">
+          <input
+            className="hover-input"
+            type="checkbox"
+            checked={areJumpChainsMerged}
+            onChange={(e) => {
+              const areJumpChainsMerged = e.target.checked
+              setJumpChainsMerged(areJumpChainsMerged)
+              onSourceChange(
+                content,
+                areEmptyJumpsEliminated,
+                areIfTrueEliminated,
+                areJumpChainsMerged,
+              )
+            }}
+          />
+          <span className="hover-text">Merge Jump Chains</span>
         </div>
         <Editor
           defaultLanguage="typescript"
@@ -154,7 +195,14 @@ export const App = () => {
             },
             overviewRulerLanes: 0,
           }}
-          onMount={() => { onSourceChange(content, areEmptyJumpsEliminated, areEmptyJumpsEliminated) }}
+          onMount={() => {
+            onSourceChange(
+              content,
+              areEmptyJumpsEliminated,
+              areEmptyJumpsEliminated,
+              areJumpChainsMerged,
+            )
+          }}
         />
       </div>
       <div className="content-container" style={{ height: '86vh', width: '90vh' }}>

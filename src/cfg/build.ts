@@ -1,5 +1,6 @@
 import * as ts from 'typescript'
 import { type BasicBlock, type Branch, forEachBasicBlock, invalidBasicBlock, invalidTransition } from './core'
+import { MultiSet } from 'mnemonist'
 
 const setParents = (entry: BasicBlock) => {
   forEachBasicBlock(entry, (block) => {
@@ -99,9 +100,43 @@ const eliminateIfTrue = (entry: BasicBlock) => {
   return entry
 }
 
+const mergeJumpChains = (entry: BasicBlock) => {
+  forEachBasicBlock(entry, (block) => {
+    if (block.end.kind != 'jump') {
+      return
+    }
+
+    const next = block.end.next
+    if (next.parents.size != 1) {
+      return
+    }
+
+    block.statements.push(...next.statements)
+    block.end = next.end
+
+    switch (next.end.kind) {
+      case 'branch': {
+        const thenBr = next.end.then
+        const elseBr = next.end.else
+        thenBr.parents.remove(next)
+        thenBr.parents.add(block)
+        elseBr.parents.remove(next)
+        elseBr.parents.add(block)
+      } break
+      case 'jump': {
+        const target = next.end.next
+        next.parents.remove(next)
+        target.parents.add(block)
+      } break
+    }
+  })
+  return entry
+}
+
 export interface BuildCfgOptions {
   areEmptyJumpsEliminated: boolean
   areIfTrueEliminated: boolean
+  areJumpChainsMerged: boolean
 }
 
 export const buildCfg = (node: ts.SourceFile, options?: BuildCfgOptions): BasicBlock => {
@@ -115,7 +150,7 @@ export const buildCfg = (node: ts.SourceFile, options?: BuildCfgOptions): BasicB
   const newBasicBlock = (prefix: string) => {
     return {
       id: newName(prefix),
-      parents: new Set(),
+      parents: new MultiSet(),
       statements: [],
       end: { kind: 'return' },
     } as BasicBlock
@@ -376,6 +411,11 @@ export const buildCfg = (node: ts.SourceFile, options?: BuildCfgOptions): BasicB
 
   if (options?.areEmptyJumpsEliminated ?? true) {
     result = eliminateEmptyJumps(result)
+    result = validate(result)
+  }
+
+  if (options?.areJumpChainsMerged ?? true) {
+    result = mergeJumpChains(result)
     result = validate(result)
   }
 
