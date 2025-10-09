@@ -26,7 +26,7 @@ export const App = () => {
   const [content, setContent] = useState(examples['Hello World'])
   const [areEmptyJumpsEliminated, setAreEmptyJumpsEliminated] = useState(true)
 
-  const onSourceChange = useCallback((source: string) => {
+  const onSourceChange = useCallback((source: string, areEmptyJumpsEliminated: boolean) => {
     const ast = buildAst(source)
     const cfg = buildCfg(ast, { areEmptyJumpsEliminated })
 
@@ -36,7 +36,7 @@ export const App = () => {
     const { nodes, edges } = toGraph(cfg)
     setNodes(nodes)
     setEdges(edges)
-  }, [areEmptyJumpsEliminated, setEdges, setNodes])
+  }, [setEdges, setNodes])
 
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const onSourceChangeDebounced = useCallback((source: string) => {
@@ -45,9 +45,9 @@ export const App = () => {
     }
 
     timer.current = setTimeout(() => {
-      onSourceChange(source)
+      onSourceChange(source, areEmptyJumpsEliminated)
     }, 300)
-  }, [onSourceChange])
+  }, [areEmptyJumpsEliminated, onSourceChange])
 
   const LayoutFlow = () => {
     const useLayout = () => {
@@ -99,7 +99,7 @@ export const App = () => {
           onChange={(e) => {
             const source = examples[e.target.value] ?? ''
             setContent(source)
-            onSourceChange(source)
+            onSourceChange(source, areEmptyJumpsEliminated)
           }}
           defaultValue="Hello World"
         >
@@ -113,8 +113,9 @@ export const App = () => {
             type="checkbox"
             checked={areEmptyJumpsEliminated}
             onChange={(e) => {
-              setAreEmptyJumpsEliminated(e.target.checked)
-              onSourceChange(content)
+              const areEmptyJumpsEliminated = e.target.checked
+              setAreEmptyJumpsEliminated(areEmptyJumpsEliminated)
+              onSourceChange(content, areEmptyJumpsEliminated)
             }}
           />
           <span className="hover-text">Eliminate Empty Jumps</span>

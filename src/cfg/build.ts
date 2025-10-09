@@ -323,7 +323,8 @@ export const buildCfg = (node: ts.SourceFile, options?: BuildCfgOptions): BasicB
   let result = entry
   result = setParents(result)
   result = validate(result)
-  if (options?.areEmptyJumpsEliminated ?? false) {
+
+  if (options?.areEmptyJumpsEliminated ?? true) {
     result = eliminateEmptyJumps(result)
     result = validate(result)
   }
