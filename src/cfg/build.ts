@@ -82,8 +82,22 @@ const eliminateEmptyJumps = (entry: BasicBlock) => {
   return entry
 }
 
+const eliminateIfTrue = (entry: BasicBlock) => {
+  forEachBasicBlock(entry, (block) => {
+    if (block.end.kind != 'branch'
+      || ts.isLiteralExpression(block.end.condition)
+      || block.end.condition.kind != ts.SyntaxKind.TrueKeyword) {
+      return
+    }
+
+    block.end = { kind: 'jump', next: block.end.then }
+  })
+  return entry
+}
+
 export interface BuildCfgOptions {
   areEmptyJumpsEliminated: boolean
+  areIfTrueEliminated: boolean
 }
 
 export const buildCfg = (node: ts.SourceFile, options?: BuildCfgOptions): BasicBlock => {
@@ -348,8 +362,14 @@ export const buildCfg = (node: ts.SourceFile, options?: BuildCfgOptions): BasicB
   visit(node)
 
   let result = entry
+
   result = setParents(result)
   result = validate(result)
+
+  if (options?.areIfTrueEliminated ?? true) {
+    result = eliminateIfTrue(result)
+    result = validate(result)
+  }
 
   if (options?.areEmptyJumpsEliminated ?? true) {
     result = eliminateEmptyJumps(result)

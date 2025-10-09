@@ -15,7 +15,7 @@ import { printAst } from '../ast/text'
 
 export const App = () => {
   const isCfgTextEnabled = false
-  const isASTEnabled = true
+  const isASTEnabled = false
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-arguments
@@ -25,10 +25,18 @@ export const App = () => {
   const [cfgText, setCfgText] = useState('')
   const [content, setContent] = useState(examples['Hello World'])
   const [areEmptyJumpsEliminated, setAreEmptyJumpsEliminated] = useState(true)
+  const [areIfTrueEliminated, setIfTrueEliminated] = useState(true)
 
-  const onSourceChange = useCallback((source: string, areEmptyJumpsEliminated: boolean) => {
+  const onSourceChange = useCallback((
+    source: string,
+    areEmptyJumpsEliminated: boolean,
+    areIfTrueEliminated: boolean,
+  ) => {
     const ast = buildAst(source)
-    const cfg = buildCfg(ast, { areEmptyJumpsEliminated })
+    const cfg = buildCfg(ast, {
+      areEmptyJumpsEliminated,
+      areIfTrueEliminated,
+    })
 
     setAstText(printAst(ast))
     setCfgText(printCfg(cfg))
@@ -45,9 +53,9 @@ export const App = () => {
     }
 
     timer.current = setTimeout(() => {
-      onSourceChange(source, areEmptyJumpsEliminated)
+      onSourceChange(source, areEmptyJumpsEliminated, areIfTrueEliminated)
     }, 300)
-  }, [areEmptyJumpsEliminated, onSourceChange])
+  }, [areEmptyJumpsEliminated, areIfTrueEliminated, onSourceChange])
 
   const LayoutFlow = () => {
     const useLayout = () => {
@@ -99,7 +107,7 @@ export const App = () => {
           onChange={(e) => {
             const source = examples[e.target.value] ?? ''
             setContent(source)
-            onSourceChange(source, areEmptyJumpsEliminated)
+            onSourceChange(source, areEmptyJumpsEliminated, areIfTrueEliminated)
           }}
           defaultValue="Hello World"
         >
@@ -115,12 +123,24 @@ export const App = () => {
             onChange={(e) => {
               const areEmptyJumpsEliminated = e.target.checked
               setAreEmptyJumpsEliminated(areEmptyJumpsEliminated)
-              onSourceChange(content, areEmptyJumpsEliminated)
+              onSourceChange(content, areEmptyJumpsEliminated, areIfTrueEliminated)
             }}
           />
           <span className="hover-text">Eliminate Empty Jumps</span>
         </div>
-        <input type="checkbox" />
+        <div className="hover-container">
+          <input
+            className="hover-input"
+            type="checkbox"
+            checked={areIfTrueEliminated}
+            onChange={(e) => {
+              const areIfTrueEliminated = e.target.checked
+              setIfTrueEliminated(areIfTrueEliminated)
+              onSourceChange(content, areEmptyJumpsEliminated, areIfTrueEliminated)
+            }}
+          />
+          <span className="hover-text">Eliminate If True</span>
+        </div>
         <Editor
           defaultLanguage="typescript"
           value={content}
@@ -134,7 +154,7 @@ export const App = () => {
             },
             overviewRulerLanes: 0,
           }}
-          onMount={() => { onSourceChange(content, areEmptyJumpsEliminated) }}
+          onMount={() => { onSourceChange(content, areEmptyJumpsEliminated, areEmptyJumpsEliminated) }}
         />
       </div>
       <div className="content-container" style={{ height: '86vh', width: '90vh' }}>
