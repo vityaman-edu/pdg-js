@@ -279,6 +279,9 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
 
         current = dead
       }
+      else if (statement.kind == ts.SyntaxKind.EndOfFileToken) {
+        return
+      }
       else {
         current.statements.push(statement)
       }
