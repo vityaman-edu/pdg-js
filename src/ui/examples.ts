@@ -77,10 +77,64 @@ while (x < 10) {
 }
 `,
 
+  'While Direct Break': `
+while (true) {
+  console.log('begin')
+  break
+  console.log('end')
+}
+`,
+
+  'While Direct Continue': `
+while (true) {
+  console.log('begin')
+  continue
+  console.log('end')
+}
+`,
+
+  'While If Break': `
+let isReady = false
+while (true) {
+  console.log('begin')
+  if (isReady) {
+    break
+  }
+  console.log('end')
+}
+`,
+
+  'While If Continue': `
+let isSuitable = false
+while (true) {
+  console.log('begin')
+  if (isSuitable) {
+    continue
+  }
+  console.log('end')
+}
+`,
+
   'Do While': `
 let x = 1
 do {
   x -= 1
+} while (x > 0)
+`,
+
+  'Do While Break': `
+let x = 1
+do {
+  x -= 1
+  break
+} while (x > 0)
+`,
+
+  'Do While Continue': `
+let x = 1
+do {
+  x -= 1
+  continue
 } while (x > 0)
 `,
 
@@ -135,19 +189,18 @@ for (let i = 0; i < 10; i++) {
 }
 `,
 
-  'Break / Continue': `
-console.log('break')
-while (true) {
-  console.log('begin')
+  'For 1 1 1 Break': `
+for (let i = 0; i < 10; i++) {
+  console.log(\`i = \${i}\`)
   break
-  console.log('end')
-}
-
-console.log('continue')
-while (true) {
-  console.log('begin')
-  continue
-  console.log('end')
 }
 `,
+
+  'For 1 1 1 Continue': `
+for (let i = 0; i < 10; i++) {
+  console.log(\`i = \${i}\`)
+  continue
+}
+`,
+
 }
