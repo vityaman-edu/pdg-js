@@ -85,7 +85,8 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
 
   const entry = newBasicBlock('start')
 
-  const loopNexts: BasicBlock[] = []
+  const loopBreaks: BasicBlock[] = []
+  const loopContinues: BasicBlock[] = []
   let current = entry
 
   const visit = (node: ts.Node) => {
@@ -131,7 +132,7 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
         const parent = current
 
         const next = { ...newBasicBlock('next'), end: parent.end }
-        loopNexts.push(next)
+        loopBreaks.push(next)
 
         const cond = {
           ...newBasicBlock('whilecond'),
@@ -143,6 +144,7 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
           },
         }
         parent.end = { kind: 'jump', next: cond as BasicBlock }
+        loopContinues.push(cond as BasicBlock)
 
         const body: BasicBlock = {
           ...newBasicBlock('whilebody'),
@@ -155,14 +157,14 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
           visit(statement.statement)
         }
 
-        loopNexts.pop()
+        loopBreaks.pop()
         current = next
       }
       else if (ts.isDoStatement(statement)) {
         const parent = current
 
         const next = { ...newBasicBlock('next'), end: parent.end }
-        loopNexts.push(next)
+        loopBreaks.push(next)
 
         const body: BasicBlock = {
           id: newName('dowhile'),
@@ -179,6 +181,7 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
           const end = body.end as Branch
           end.then = body
         }
+        loopContinues.push(body)
 
         parent.end = { kind: 'jump', next: body }
 
@@ -187,14 +190,14 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
           visit(statement.statement)
         }
 
-        loopNexts.pop()
+        loopBreaks.pop()
         current = next
       }
       else if (ts.isForStatement(statement)) {
         const parent = current
 
         const next = { ...newBasicBlock('next'), end: parent.end }
-        loopNexts.push(next)
+        loopBreaks.push(next)
 
         const initializer: BasicBlock = {
           ...newBasicBlock('forinit'),
@@ -237,22 +240,40 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
           },
         }
         body.end = { kind: 'jump', next: incrementor }
+        loopContinues.push(incrementor)
 
-        loopNexts.pop()
+        loopBreaks.pop()
         current = next
       }
       else if (ts.isBreakStatement(statement)) {
-        if (loopNexts.length == 0) {
+        if (loopBreaks.length == 0) {
           throw new Error('No enclosing loop')
         }
 
-        const loopNext = loopNexts[loopNexts.length - 1]
+        const loopBreak = loopBreaks[loopBreaks.length - 1]
         const dead = { ...newBasicBlock('breakdead'), end: current.end }
 
         current.end = {
           kind: 'branch',
           condition: ts.factory.createTrue(),
-          then: loopNext,
+          then: loopBreak,
+          else: dead,
+        }
+
+        current = dead
+      }
+      else if (ts.isContinueStatement(statement)) {
+        if (loopBreaks.length == 0) {
+          throw new Error('No enclosing loop')
+        }
+
+        const loopContinue = loopContinues[loopContinues.length - 1]
+        const dead = { ...newBasicBlock('continuedead'), end: current.end }
+
+        current.end = {
+          kind: 'branch',
+          condition: ts.factory.createTrue(),
+          then: loopContinue,
           else: dead,
         }
 
