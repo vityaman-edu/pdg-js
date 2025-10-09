@@ -196,11 +196,30 @@ for (let i = 0; i < 10; i++) {
 }
 `,
 
+  'For 1 1 1 If Break': `
+for (let i = 0; i < 10; i++) {
+  if (i % 2 == 0) {
+    break
+  }
+  console.log(\`i = \${i}\`)
+}
+`,
+
   'For 1 1 1 Continue': `
 for (let i = 0; i < 10; i++) {
   console.log(\`i = \${i}\`)
   continue
 }
 `,
+
+  'For 1 1 1 If Continue': `
+for (let i = 0; i < 10; i++) {
+  if (i % 2 == 0) {
+    continue
+  }
+  console.log(\`i = \${i}\`)
+}
+`,
+
 
 }
