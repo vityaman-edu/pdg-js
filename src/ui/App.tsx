@@ -74,6 +74,14 @@ export const App = () => {
           nodeTypes={{ multiline: MultilineNode }}
           edgeTypes={{ smart: SmartBezierEdge }}
           fitView
+          fitViewOptions={{
+            padding: {
+              top: '10%',
+              bottom: '10%',
+              left: '10%',
+              right: '10%',
+            },
+          }}
         >
           <Background />
         </ReactFlow>
