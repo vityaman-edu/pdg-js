@@ -15,7 +15,7 @@ import { printAst } from '../ast/text'
 
 export const App = () => {
   const isCfgTextEnabled = false
-  const isASTEnabled = false
+  const isASTEnabled = true
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-arguments

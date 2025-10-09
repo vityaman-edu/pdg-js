@@ -158,6 +158,7 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
         }
 
         loopBreaks.pop()
+        loopContinues.pop()
         current = next
       }
       else if (ts.isDoStatement(statement)) {
@@ -191,6 +192,7 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
         }
 
         loopBreaks.pop()
+        loopContinues.pop()
         current = next
       }
       else if (ts.isForStatement(statement)) {
@@ -217,6 +219,16 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
         }
         initializer.end = { kind: 'jump', next: condition }
 
+        const incrementor: BasicBlock = {
+          ...newBasicBlock('forinc'),
+          statements: statement.incrementor != null ? [statement.incrementor] : [],
+          end: {
+            kind: 'jump',
+            next: condition,
+          },
+        }
+        loopContinues.push(incrementor)
+
         const body: BasicBlock = {
           ...newBasicBlock('forbody'),
           end: invalidTransition(),
@@ -230,19 +242,10 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
           current = body
           visit(statement.statement)
         }
-
-        const incrementor: BasicBlock = {
-          ...newBasicBlock('forinc'),
-          statements: statement.incrementor != null ? [statement.incrementor] : [],
-          end: {
-            kind: 'jump',
-            next: condition,
-          },
-        }
-        body.end = { kind: 'jump', next: incrementor }
-        loopContinues.push(incrementor)
+        current.end = { kind: 'jump', next: incrementor }
 
         loopBreaks.pop()
+        loopContinues.pop()
         current = next
       }
       else if (ts.isBreakStatement(statement)) {
@@ -293,7 +296,7 @@ export const buildCfg = (node: ts.SourceFile): BasicBlock => {
   let result = entry
   result = setParents(result)
   result = validateParents(result)
-  result = eliminateEmptyJumps(result)
+  // result = eliminateEmptyJumps(result)
   result = validateParents(result)
 
   return result
