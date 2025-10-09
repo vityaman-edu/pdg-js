@@ -82,7 +82,6 @@ const eliminateEmptyJumps = (entry: BasicBlock) => {
   return entry
 }
 
-// TODO: BuildCfgOptions
 export interface BuildCfgOptions {
   areEmptyJumpsEliminated: boolean
 }

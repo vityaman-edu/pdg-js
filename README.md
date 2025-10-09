@@ -37,5 +37,5 @@ Program Dependence Graph for the TypeScript.
 - [x] `break` and `continue`
 - [x] Separate tests
 - [x] Refresh on test choice
-- [ ] `if {} else if {} else {}`
+- [x] `if {} else if {} else {}`
 - [ ] Data dependencies
