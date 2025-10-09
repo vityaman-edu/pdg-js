@@ -307,7 +307,12 @@ export const buildCfg = (node: ts.SourceFile, options?: BuildCfgOptions): BasicB
       current.end = {
         kind: 'branch',
         condition: ts.factory.createTrue(),
-        then: newBasicBlock('return'),
+        then: {
+          ...newBasicBlock('return'), end: {
+            kind: 'return',
+            expression: statement.expression,
+          },
+        },
         else: dead,
       }
 

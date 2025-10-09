@@ -13,7 +13,7 @@ export const toGraph = (entry: BasicBlock) => {
     let end = ''
     switch (block.end.kind) {
       case 'return': {
-        end = 'return'
+        end = `return ${toStringExpr(block.end.expression)}`
       } break
       case 'branch': {
         end = `if (${toStringExpr(block.end.condition)})`

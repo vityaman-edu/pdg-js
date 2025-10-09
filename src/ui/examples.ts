@@ -5,29 +5,26 @@ console.log('Sorry, I have a boyfriend.')
 `,
 
   'Fibonacci': `
-let ans = 1
-if (n < 0) {
-  return
-}
-if (n === 0) {
-    ans =  0;
-}
-if (n === 1) {
-    ans =  1;
-}
+function fibonacciIterative(n: number): number {
+  if (n < 0) {
+    throw new Error();
+  }
 
-let a = 0; // F(0)
-let b = 1; // F(1)
+  if (n <= 1) {
+    return n;
+  }
 
-let i = 2
-while (i <= n) {
-  const temp = a + b;
-  a = b;
-  b = temp;
-  i++
+  let a = 0;
+  let b = 1;
+
+  for (let i = 2; i <= n; i++) {
+    const temp = a + b;
+    a = b;
+    b = temp;
+  }
+
+  return b;
 }
-
-ans =  b;
 `,
 
   'If Statement (if {})': `

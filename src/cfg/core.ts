@@ -2,6 +2,7 @@ import * as ts from 'typescript'
 
 export interface Return {
   kind: 'return'
+  expression?: ts.Expression
 }
 
 export interface Jump {

@@ -1,10 +1,15 @@
 import * as ts from 'typescript'
 import { type BasicBlock, forEachBasicBlock } from './core'
 
-export const toStringExpr = (expr: ts.Expression) => {
+export const toStringExpr = (expr: ts.Expression | undefined) => {
+  if (expr == null) {
+    return ''
+  }
+
   if (expr.kind == ts.SyntaxKind.TrueKeyword) {
     return 'true'
   }
+
   return expr.getText()
 }
 
@@ -25,7 +30,7 @@ export const toStringBB = (block: BasicBlock) => {
   const end = block.end
   switch (end.kind) {
     case 'return': {
-      output += 'return'
+      output += `return ${toStringExpr(end.expression)}`
     } break
     case 'jump': {
       output += `jump('${end.next.id}')`
