@@ -12,10 +12,13 @@ import { buildCfg } from '../cfg/build'
 import { printCfg } from '../cfg/text'
 import { toGraph } from './cfg/graph'
 import { printAst } from '../ast/text'
+import { printDdg } from '../ddg/text'
+import { buildDdg } from '../ddg/build'
 
 export const App = () => {
   const isCfgTextEnabled = false
-  const isASTEnabled = false
+  const isDdgTextEnabled = true
+  const isASTEnabled = true
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-arguments
@@ -23,6 +26,7 @@ export const App = () => {
 
   const [astText, setAstText] = useState('')
   const [cfgText, setCfgText] = useState('')
+  const [ddgText, setDdgText] = useState('')
   const [content, setContent] = useState(examples['Hello World'])
   const [areEmptyJumpsEliminated, setAreEmptyJumpsEliminated] = useState(true)
   const [areIfTrueEliminated, setIfTrueEliminated] = useState(true)
@@ -40,9 +44,11 @@ export const App = () => {
       areIfTrueEliminated,
       areJumpChainsMerged,
     })
+    const ddg = buildDdg(ast)
 
     setAstText(printAst(ast))
     setCfgText(printCfg(cfg))
+    setDdgText(printDdg(ddg))
 
     const { nodes, edges } = toGraph(cfg)
     setNodes(nodes)
@@ -233,7 +239,25 @@ export const App = () => {
           </div>
         )
       }
-
+      {// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        isDdgTextEnabled
+        && (
+          <div className="content-container" style={{ height: '86vh', width: '90vh' }}>
+            <h2>Data Dependency Graph (Text)</h2>
+            <div
+              style={{
+                padding: '12px',
+                fontSize: 13,
+                fontFamily: 'monospace',
+                whiteSpace: 'pre-wrap',
+                lineHeight: 1.4,
+              }}
+            >
+              {ddgText}
+            </div>
+          </div>
+        )
+      }
       {// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         isASTEnabled && (
           <div className="content-container" style={{ height: '86vh', width: '90vh' }}>

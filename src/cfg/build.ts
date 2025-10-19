@@ -416,7 +416,6 @@ export const buildCfg = (node: ts.SourceFile, options?: BuildCfgOptions): BasicB
 
   if (options?.areJumpChainsMerged ?? true) {
     for (let i = 0; i < 8; ++i) {
-      console.log(i)
       result = mergeJumpChains(result)
       result = validate(result)
     }
