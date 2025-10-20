@@ -2,29 +2,41 @@ import ts from 'typescript'
 import { isAssignmentExpression, type Ddg } from './core'
 import { Scope } from './scope'
 
-export const buildDdg = (node: ts.SourceFile): Ddg => {
-  const ddg: Ddg = { requirements: new Map() }
-  const scope = new Scope()
+export const referencedVariables = (node: ts.Expression): ts.Identifier[] => {
+  const ids: ts.Identifier[] = []
 
-  const visitExpression = (node: ts.Node | undefined) => {
-    if (node == undefined) {
-      return
-    }
-
+  const visitExpression = (node: ts.Node) => {
     if (isAssignmentExpression(node)) {
       throw Error(`assignment expression is unsupported`)
     }
 
     if (ts.isIdentifier(node)) {
-      const requirement = scope.lookup(node.text)
-      if (requirement != undefined) {
-        ddg.requirements.set(node, requirement)
-      }
-
+      ids.push(node)
       return
     }
 
     node.forEachChild(visitExpression)
+  }
+
+  visitExpression(node)
+  return ids
+}
+
+export const buildDdg = (node: ts.SourceFile): Ddg => {
+  const ddg: Ddg = { dependencies: new Map() }
+  const scope = new Scope()
+
+  const visitExpression = (node: ts.Expression | undefined) => {
+    if (node == undefined) {
+      return
+    }
+
+    referencedVariables(node).forEach((node) => {
+      const requirement = scope.lookup(node.text)
+      if (requirement != undefined) {
+        ddg.dependencies.set(node, requirement)
+      }
+    })
   }
 
   const visitStatement = (statement: ts.Node) => {

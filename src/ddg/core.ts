@@ -5,7 +5,7 @@ export type Assignment
     | ts.BinaryExpression
 
 export interface Ddg {
-  requirements: Map<ts.Identifier, Assignment>
+  dependencies: Map<ts.Identifier, Assignment>
 };
 
 export const isAssignmentExpression = (node: ts.Node): node is ts.BinaryExpression => {

@@ -2,7 +2,7 @@ import { type Ddg } from './core'
 
 export const printDdg = (ddg: Ddg): string => {
   let output = ''
-  for (const [id, requirement] of ddg.requirements) {
+  for (const [id, requirement] of ddg.dependencies) {
     const file = id.getSourceFile()
     const expand = (pos: number) => file.getLineAndCharacterOfPosition(pos)
 
