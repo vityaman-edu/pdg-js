@@ -31,18 +31,21 @@ export const App = () => {
   const [areEmptyJumpsEliminated, setAreEmptyJumpsEliminated] = useState(true)
   const [areIfTrueEliminated, setIfTrueEliminated] = useState(true)
   const [areJumpChainsMerged, setJumpChainsMerged] = useState(true)
+  const [isSplitted, setSplitted] = useState(false)
 
   const onSourceChange = useCallback((
     source: string,
     areEmptyJumpsEliminated: boolean,
     areIfTrueEliminated: boolean,
     areJumpChainsMerged: boolean,
+    isSplitted: boolean,
   ) => {
     const ast = buildAst(source)
     const cfg = buildCfg(ast, {
       areEmptyJumpsEliminated,
       areIfTrueEliminated,
       areJumpChainsMerged,
+      isSplitted,
     })
     const ddg = buildDdg(ast)
 
@@ -67,9 +70,16 @@ export const App = () => {
         areEmptyJumpsEliminated,
         areIfTrueEliminated,
         areJumpChainsMerged,
+        isSplitted,
       )
     }, 300)
-  }, [areEmptyJumpsEliminated, areIfTrueEliminated, areJumpChainsMerged, onSourceChange])
+  }, [
+    areEmptyJumpsEliminated,
+    areIfTrueEliminated,
+    areJumpChainsMerged,
+    isSplitted,
+    onSourceChange,
+  ])
 
   const LayoutFlow = () => {
     const useLayout = () => {
@@ -126,6 +136,7 @@ export const App = () => {
               areEmptyJumpsEliminated,
               areIfTrueEliminated,
               areJumpChainsMerged,
+              isSplitted,
             )
           }}
           defaultValue="Hello World"
@@ -147,6 +158,7 @@ export const App = () => {
                 areEmptyJumpsEliminated,
                 areIfTrueEliminated,
                 areJumpChainsMerged,
+                isSplitted,
               )
             }}
           />
@@ -165,6 +177,7 @@ export const App = () => {
                 areEmptyJumpsEliminated,
                 areIfTrueEliminated,
                 areJumpChainsMerged,
+                isSplitted,
               )
             }}
           />
@@ -183,10 +196,30 @@ export const App = () => {
                 areEmptyJumpsEliminated,
                 areIfTrueEliminated,
                 areJumpChainsMerged,
+                isSplitted,
               )
             }}
           />
           <span className="hover-text">Merge Jump Chains</span>
+        </div>
+        <div className="hover-container">
+          <input
+            className="hover-input"
+            type="checkbox"
+            checked={isSplitted}
+            onChange={(e) => {
+              const isSplitted = e.target.checked
+              setSplitted(isSplitted)
+              onSourceChange(
+                content,
+                areEmptyJumpsEliminated,
+                areIfTrueEliminated,
+                areJumpChainsMerged,
+                isSplitted,
+              )
+            }}
+          />
+          <span className="hover-text">Split CFG</span>
         </div>
         <Editor
           defaultLanguage="typescript"

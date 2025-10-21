@@ -1,6 +1,7 @@
 import * as ts from 'typescript'
 import { type BasicBlock, type Branch, forEachBasicBlock, invalidBasicBlock, invalidTransition } from './core'
 import { MultiSet } from 'mnemonist'
+import { split } from './split'
 
 const setParents = (entry: BasicBlock) => {
   forEachBasicBlock(entry, (block) => {
@@ -137,6 +138,7 @@ export interface BuildCfgOptions {
   areEmptyJumpsEliminated: boolean
   areIfTrueEliminated: boolean
   areJumpChainsMerged: boolean
+  isSplitted: boolean
 }
 
 export const buildCfg = (node: ts.SourceFile, options?: BuildCfgOptions): BasicBlock => {
@@ -419,6 +421,11 @@ export const buildCfg = (node: ts.SourceFile, options?: BuildCfgOptions): BasicB
       result = mergeJumpChains(result)
       result = validate(result)
     }
+  }
+
+  if (options?.isSplitted ?? false) {
+    result = split(result)
+    result = validate(result)
   }
 
   return result
