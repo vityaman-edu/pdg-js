@@ -169,14 +169,14 @@ export const buildCfg = (node: ts.SourceFile, options?: BuildCfgOptions): BasicB
 
       const thenBlock: BasicBlock = {
         id: newName('then'),
-        parents: new Set(),
+        parents: new MultiSet(),
         statements: [],
         end: { kind: 'jump', next },
       }
 
       const elseBlock: BasicBlock = {
         id: newName('else'),
-        parents: new Set(),
+        parents: new MultiSet(),
         statements: [],
         end: { kind: 'jump', next },
       }
@@ -241,7 +241,7 @@ export const buildCfg = (node: ts.SourceFile, options?: BuildCfgOptions): BasicB
 
       const body: BasicBlock = {
         id: newName('dowhile'),
-        parents: new Set([]),
+        parents: new MultiSet(),
         statements: [],
         end: {
           kind: 'branch',

@@ -1,4 +1,4 @@
-import type { MultiSet } from 'mnemonist'
+import { MultiSet } from 'mnemonist'
 import * as ts from 'typescript'
 
 export interface Return {
@@ -61,7 +61,7 @@ export const forEachBasicBlock = (
 export const invalidBasicBlock = () => {
   return {
     id: 'invalid',
-    parents: new Set(),
+    parents: new MultiSet<BasicBlock>(),
     statements: [],
     end: { kind: 'return' },
   } as BasicBlock
