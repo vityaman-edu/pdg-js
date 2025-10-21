@@ -27,6 +27,8 @@ const getEndTextColor = (data: NodeData) => {
 }
 
 export const MultilineNode = ({ data }: { data: NodeData }) => {
+  const isLabelShown = false
+
   return (
     <div style={{
       border: '2px solid #333',
@@ -44,19 +46,25 @@ export const MultilineNode = ({ data }: { data: NodeData }) => {
         isConnectable={true}
         style={{ background: '#555' }}
       />
-      <div
-        style={{
-          backgroundColor: '#333',
-          color: 'white',
-          padding: '4px 4px',
-          fontWeight: 'bold',
-          fontSize: 14,
-          textAlign: 'center',
-        }}
-      >
-        {data.label}
-      </div>
-      { data.body && (
+
+      {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        isLabelShown && (
+          <div
+            style={{
+              backgroundColor: '#333',
+              color: 'white',
+              padding: '4px 4px',
+              fontWeight: 'bold',
+              fontSize: 14,
+              textAlign: 'center',
+            }}
+          >
+            {data.label}
+          </div>
+        )
+      }
+      {data.body && (
         <div
           style={{
             padding: '4px',
@@ -69,7 +77,7 @@ export const MultilineNode = ({ data }: { data: NodeData }) => {
           {data.body}
         </div>
       )}
-      {data.end && (
+      {data.end && data.end != 'jump' && (
         <div
           style={{
             backgroundColor: getEndBackgroundColor(data),

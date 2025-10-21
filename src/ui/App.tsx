@@ -17,8 +17,8 @@ import { buildDdg } from '../ddg/build'
 
 export const App = () => {
   const isCfgTextEnabled = false
-  const isDdgTextEnabled = true
-  const isASTEnabled = true
+  const isDdgTextEnabled = false
+  const isASTEnabled = false
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-arguments
@@ -240,6 +240,7 @@ export const App = () => {
               areEmptyJumpsEliminated,
               areEmptyJumpsEliminated,
               areJumpChainsMerged,
+              isSplitted,
             )
           }}
         />
@@ -251,8 +252,7 @@ export const App = () => {
         </ReactFlowProvider>
       </div>
       {// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        isCfgTextEnabled
-        && (
+        isCfgTextEnabled && (
           <div className="content-container" style={{ height: '86vh', width: '90vh' }}>
             <h2>Control Flow Graph (Text)</h2>
             <Editor
@@ -273,8 +273,7 @@ export const App = () => {
         )
       }
       {// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        isDdgTextEnabled
-        && (
+        isDdgTextEnabled && (
           <div className="content-container" style={{ height: '86vh', width: '90vh' }}>
             <h2>Data Dependency Graph (Text)</h2>
             <div
