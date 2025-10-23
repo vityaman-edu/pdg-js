@@ -303,7 +303,7 @@ export const App = () => {
             <div
               style={{
                 padding: '12px',
-                fontSize: 13,
+                fontSize: 18,
                 fontFamily: 'monospace',
                 whiteSpace: 'pre-wrap',
                 lineHeight: 1.4,

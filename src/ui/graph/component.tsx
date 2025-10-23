@@ -27,7 +27,7 @@ const getEndTextColor = (data: NodeData) => {
 }
 
 export const MultilineNode = ({ data }: { data: NodeData }) => {
-  const isLabelShown = true
+  const isLabelShown = false
 
   return (
     <div style={{
@@ -40,20 +40,28 @@ export const MultilineNode = ({ data }: { data: NodeData }) => {
       boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
     }}
     >
-      <Handle
-        type="target"
-        position={Position.Top}
-        isConnectable={true}
-        style={{ background: '#555' }}
-        id="target"
-      />
-      <Handle
-        type="source"
-        position={Position.Right}
-        isConnectable={true}
-        style={{ background: '#555' }}
-        id="source2"
-      />
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+      }}
+      >
+        <Handle
+          type="target"
+          position={Position.Top}
+          isConnectable={true}
+          style={{ background: '#555', left: '25%' }}
+          id="target"
+        />
+        <Handle
+          type="source"
+          position={Position.Top}
+          isConnectable={true}
+          style={{ background: '#555', left: '75%' }}
+          id="source2"
+        />
+      </div>
 
       {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -100,20 +108,28 @@ export const MultilineNode = ({ data }: { data: NodeData }) => {
           {data.end}
         </div>
       )}
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        isConnectable={true}
-        style={{ background: '#555' }}
-        id="source"
-      />
-      <Handle
-        type="target"
-        position={Position.Right}
-        isConnectable={true}
-        style={{ background: '#555' }}
-        id="target2"
-      />
+      <div style={{
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+      }}
+      >
+        <Handle
+          type="source"
+          position={Position.Bottom}
+          isConnectable={true}
+          style={{ background: '#555', left: '25%' }}
+          id="source"
+        />
+        <Handle
+          type="target"
+          position={Position.Bottom}
+          isConnectable={true}
+          style={{ background: '#555', left: '75%' }}
+          id="target2"
+        />
+      </div>
     </div>
   )
 }

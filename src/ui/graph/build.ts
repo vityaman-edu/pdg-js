@@ -71,18 +71,20 @@ export const toGraph = (
       } break
     }
 
-    let strokeWidth = 4
+    let type = 'smart'
+    let strokeWidth = 3
     let targetHandle = 'target'
     let sourceHandle = 'source'
     if (label == 'depends') {
+      type = 'default'
       targetHandle += '2'
       sourceHandle += '2'
-      strokeWidth = 2
+      strokeWidth = 1.5
     }
 
     return {
       id: newId(),
-      type: 'smart',
+      type: type,
       source,
       target,
       markerEnd: {
