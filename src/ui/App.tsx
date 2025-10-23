@@ -169,7 +169,8 @@ export const App = () => {
               border: `1px solid ${systemTheme === 'vs-dark' ? '#555' : '#ccc'}`,
               borderRadius: '4px',
               padding: '5px',
-              fontSize: '14px',
+              fontSize: '1.25em',
+              fontWeight: 'bold',
             }}
             onChange={(e) => {
               const source = examples[e.target.value] ?? ''
