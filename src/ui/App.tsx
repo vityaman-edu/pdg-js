@@ -16,11 +16,17 @@ import { printDdg } from '../ddg/text'
 import { buildDdg } from '../ddg/build'
 import { physicalNames } from '../ast/rename'
 
-export const App = () => {
-  const isCfgTextEnabled = false
-  const isDdgTextEnabled = false
-  const isASTEnabled = false
+const GraphView = {
+  None: 0,
+  AST: 1,
+  CFG: 2,
+  DDG: 3,
+} as const
 
+type GraphView = typeof GraphView[keyof typeof GraphView]
+
+export const App = () => {
+  const [graphView, setGraphView] = useState<GraphView>(GraphView.None)
   const [systemTheme, setSystemTheme] = useState<'vs' | 'vs-dark'>('vs')
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-arguments
@@ -311,15 +317,37 @@ export const App = () => {
         </div>
       </div>
       <div className="content-container" style={{ width: '800px' }}>
-        <h2>Control Flow Graph</h2>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h2>Control Flow Graph</h2>
+          <select
+            style={{
+              marginLeft: '10px',
+              backgroundColor: systemTheme === 'vs-dark' ? '#333' : '#f9f9f9',
+              color: systemTheme === 'vs-dark' ? '#fff' : '#000',
+              border: `1px solid ${systemTheme === 'vs-dark' ? '#555' : '#ccc'}`,
+              borderRadius: '4px',
+              padding: '5px',
+              fontSize: '14px',
+            }}
+            onChange={(e) => {
+              setGraphView(parseInt(e.target.value, 10) as GraphView)
+            }}
+            defaultValue={GraphView.None}
+          >
+            <option value={GraphView.None}>None</option>
+            <option value={GraphView.AST}>AST</option>
+            <option value={GraphView.CFG}>CFG</option>
+            <option value={GraphView.DDG}>DDG</option>
+          </select>
+        </div>
         <div className="cfg-wrapper">
           <ReactFlowProvider>
             <LayoutFlow />
           </ReactFlowProvider>
         </div>
       </div>
-      {// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        isCfgTextEnabled && (
+      {
+        graphView === GraphView.CFG && (
           <div className="content-container" style={{ width: '400px' }}>
             <h2>Control Flow Graph (Text)</h2>
             <Editor
@@ -340,8 +368,8 @@ export const App = () => {
           </div>
         )
       }
-      {// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        isDdgTextEnabled && (
+      {
+        graphView === GraphView.DDG && (
           <div className="content-container" style={{ width: '400px' }}>
             <h2>Data Dependency Graph (Text)</h2>
             <div
@@ -358,8 +386,8 @@ export const App = () => {
           </div>
         )
       }
-      {// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        isASTEnabled && (
+      {
+        graphView === GraphView.AST && (
           <div className="content-container" style={{ width: '400px' }}>
             <h2>Abstract Syntax Tree (Text)</h2>
             <div
