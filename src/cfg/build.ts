@@ -356,7 +356,7 @@ export const buildCfg = (node: ts.SourceFile, options?: BuildCfgOptions): BasicB
 
       current = dead
     }
-    else if (ts.isReturnStatement(statement)) {
+    else if (ts.isReturnStatement(statement) || ts.isThrowStatement(statement)) {
       const dead = { ...newBasicBlock('returndead'), end: current.end }
 
       current.end = {
