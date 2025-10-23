@@ -160,7 +160,7 @@ export const App = () => {
     <div className="app-container">
       <div className="editor-container" style={{ width: '800px' }}>
         <div className="editor-controls">
-          <h2>Editor</h2>
+          <img src="public/pdg-js.png" alt="logo" style={{ height: '76px' }} />
           <select
             style={{
               marginLeft: '10px',
@@ -319,7 +319,7 @@ export const App = () => {
         </div>
       </div>
       <div className="content-container" style={{ width: '880px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
           <h2>Control Flow Graph</h2>
           <select
             style={{
@@ -351,7 +351,7 @@ export const App = () => {
       {
         graphView === GraphView.CFG && (
           <div className="content-container" style={{ width: '400px' }}>
-            <h2>Control Flow Graph (Text)</h2>
+            <h2 style={{ display: 'flex', alignItems: 'center' }}>Control Flow Graph (Text)</h2>
             <Editor
               defaultLanguage="typescript"
               value={cfgText}
@@ -373,7 +373,7 @@ export const App = () => {
       {
         graphView === GraphView.DDG && (
           <div className="content-container" style={{ width: '400px' }}>
-            <h2>Data Dependency Graph (Text)</h2>
+            <h2 style={{ display: 'flex', alignItems: 'center' }}>Data Dependency Graph (Text)</h2>
             <div
               style={{
                 padding: '12px',
@@ -391,7 +391,7 @@ export const App = () => {
       {
         graphView === GraphView.AST && (
           <div className="content-container" style={{ width: '400px' }}>
-            <h2>Abstract Syntax Tree (Text)</h2>
+            <h2 style={{ display: 'flex', alignItems: 'center' }}>Abstract Syntax Tree (Text)</h2>
             <div
               style={{
                 padding: '12px',
