@@ -18,7 +18,7 @@ import { physicalNames } from '../ast/rename'
 
 export const App = () => {
   const isCfgTextEnabled = false
-  const isDdgTextEnabled = true
+  const isDdgTextEnabled = false
   const isASTEnabled = false
 
   const [systemTheme, setSystemTheme] = useState<'vs' | 'vs-dark'>('vs')
@@ -150,46 +150,24 @@ export const App = () => {
 
   return (
     <div className="app-container">
-      <div className="editor-container" style={{ height: '80vh', width: '80vh' }}>
-        <h2>Editor</h2>
-        <select
-          style={{
-            marginLeft: '10px',
-            backgroundColor: systemTheme === 'vs-dark' ? '#333' : '#f9f9f9',
-            color: systemTheme === 'vs-dark' ? '#fff' : '#000',
-            border: `1px solid ${systemTheme === 'vs-dark' ? '#555' : '#ccc'}`,
-            borderRadius: '4px',
-            padding: '5px',
-            fontSize: '14px',
-          }}
-          onChange={(e) => {
-            const source = examples[e.target.value] ?? ''
-            setContent(source)
-            onSourceChange(
-              source,
-              areEmptyJumpsEliminated,
-              areIfTrueEliminated,
-              areJumpChainsMerged,
-              isSplitted,
-              isDdgDrawn,
-            )
-          }}
-          defaultValue="Hello World"
-        >
-          {Object.entries(examples).map(entry => (
-            <option key={entry[0]} value={entry[0]}>{entry[0]}</option>
-          ))}
-        </select>
-        <div className="hover-container">
-          <input
-            className="hover-input"
-            type="checkbox"
-            checked={areEmptyJumpsEliminated}
+      <div className="editor-container" style={{ width: '800px' }}>
+        <div className="editor-controls">
+          <h2>Editor</h2>
+          <select
+            style={{
+              marginLeft: '10px',
+              backgroundColor: systemTheme === 'vs-dark' ? '#333' : '#f9f9f9',
+              color: systemTheme === 'vs-dark' ? '#fff' : '#000',
+              border: `1px solid ${systemTheme === 'vs-dark' ? '#555' : '#ccc'}`,
+              borderRadius: '4px',
+              padding: '5px',
+              fontSize: '14px',
+            }}
             onChange={(e) => {
-              const areEmptyJumpsEliminated = e.target.checked
-              setAreEmptyJumpsEliminated(areEmptyJumpsEliminated)
+              const source = examples[e.target.value] ?? ''
+              setContent(source)
               onSourceChange(
-                content,
+                source,
                 areEmptyJumpsEliminated,
                 areIfTrueEliminated,
                 areJumpChainsMerged,
@@ -197,124 +175,152 @@ export const App = () => {
                 isDdgDrawn,
               )
             }}
-          />
-          <span className="hover-text">Eliminate Empty Jumps</span>
+            defaultValue="Hello World"
+          >
+            {Object.entries(examples).map(entry => (
+              <option key={entry[0]} value={entry[0]}>{entry[0]}</option>
+            ))}
+          </select>
+          <div className="hover-container">
+            <input
+              className="hover-input"
+              type="checkbox"
+              checked={areEmptyJumpsEliminated}
+              onChange={(e) => {
+                const areEmptyJumpsEliminated = e.target.checked
+                setAreEmptyJumpsEliminated(areEmptyJumpsEliminated)
+                onSourceChange(
+                  content,
+                  areEmptyJumpsEliminated,
+                  areIfTrueEliminated,
+                  areJumpChainsMerged,
+                  isSplitted,
+                  isDdgDrawn,
+                )
+              }}
+            />
+            <span className="hover-text">Eliminate Empty Jumps</span>
+          </div>
+          <div className="hover-container">
+            <input
+              className="hover-input"
+              type="checkbox"
+              checked={areIfTrueEliminated}
+              onChange={(e) => {
+                const areIfTrueEliminated = e.target.checked
+                setIfTrueEliminated(areIfTrueEliminated)
+                onSourceChange(
+                  content,
+                  areEmptyJumpsEliminated,
+                  areIfTrueEliminated,
+                  areJumpChainsMerged,
+                  isSplitted,
+                  isDdgDrawn,
+                )
+              }}
+            />
+            <span className="hover-text">Eliminate If True</span>
+          </div>
+          <div className="hover-container">
+            <input
+              className="hover-input"
+              type="checkbox"
+              checked={areJumpChainsMerged}
+              onChange={(e) => {
+                const areJumpChainsMerged = e.target.checked
+                setJumpChainsMerged(areJumpChainsMerged)
+                onSourceChange(
+                  content,
+                  areEmptyJumpsEliminated,
+                  areIfTrueEliminated,
+                  areJumpChainsMerged,
+                  isSplitted,
+                  isDdgDrawn,
+                )
+              }}
+            />
+            <span className="hover-text">Merge Jump Chains</span>
+          </div>
+          <div className="hover-container">
+            <input
+              className="hover-input"
+              type="checkbox"
+              checked={isSplitted}
+              onChange={(e) => {
+                const isSplitted = e.target.checked
+                setSplitted(isSplitted)
+                onSourceChange(
+                  content,
+                  areEmptyJumpsEliminated,
+                  areIfTrueEliminated,
+                  areJumpChainsMerged,
+                  isSplitted,
+                  isDdgDrawn,
+                )
+              }}
+            />
+            <span className="hover-text">Split CFG</span>
+          </div>
+          <div className="hover-container">
+            <input
+              className="hover-input"
+              type="checkbox"
+              checked={isDdgDrawn}
+              onChange={(e) => {
+                const isDdgDrawn = e.target.checked
+                setDdgDrawn(isDdgDrawn)
+                onSourceChange(
+                  content,
+                  areEmptyJumpsEliminated,
+                  areIfTrueEliminated,
+                  areJumpChainsMerged,
+                  isSplitted,
+                  isDdgDrawn,
+                )
+              }}
+            />
+            <span className="hover-text">Draw DDG Edges</span>
+          </div>
         </div>
-        <div className="hover-container">
-          <input
-            className="hover-input"
-            type="checkbox"
-            checked={areIfTrueEliminated}
-            onChange={(e) => {
-              const areIfTrueEliminated = e.target.checked
-              setIfTrueEliminated(areIfTrueEliminated)
+        <div className="editor-wrapper">
+          <Editor
+            defaultLanguage="typescript"
+            value={content}
+            onChange={(value) => { onSourceChangeDebounced(value ?? '') }}
+            theme={systemTheme}
+            options={{
+              fontSize: 16,
+              minimap: { enabled: false },
+              scrollbar: {
+                vertical: 'hidden',
+                horizontal: 'hidden',
+              },
+              overviewRulerLanes: 0,
+            }}
+            onMount={() => {
               onSourceChange(
                 content,
                 areEmptyJumpsEliminated,
-                areIfTrueEliminated,
+                areEmptyJumpsEliminated,
                 areJumpChainsMerged,
                 isSplitted,
                 isDdgDrawn,
               )
             }}
           />
-          <span className="hover-text">Eliminate If True</span>
         </div>
-        <div className="hover-container">
-          <input
-            className="hover-input"
-            type="checkbox"
-            checked={areJumpChainsMerged}
-            onChange={(e) => {
-              const areJumpChainsMerged = e.target.checked
-              setJumpChainsMerged(areJumpChainsMerged)
-              onSourceChange(
-                content,
-                areEmptyJumpsEliminated,
-                areIfTrueEliminated,
-                areJumpChainsMerged,
-                isSplitted,
-                isDdgDrawn,
-              )
-            }}
-          />
-          <span className="hover-text">Merge Jump Chains</span>
-        </div>
-        <div className="hover-container">
-          <input
-            className="hover-input"
-            type="checkbox"
-            checked={isSplitted}
-            onChange={(e) => {
-              const isSplitted = e.target.checked
-              setSplitted(isSplitted)
-              onSourceChange(
-                content,
-                areEmptyJumpsEliminated,
-                areIfTrueEliminated,
-                areJumpChainsMerged,
-                isSplitted,
-                isDdgDrawn,
-              )
-            }}
-          />
-          <span className="hover-text">Split CFG</span>
-        </div>
-        <div className="hover-container">
-          <input
-            className="hover-input"
-            type="checkbox"
-            checked={isDdgDrawn}
-            onChange={(e) => {
-              const isDdgDrawn = e.target.checked
-              setDdgDrawn(isDdgDrawn)
-              onSourceChange(
-                content,
-                areEmptyJumpsEliminated,
-                areIfTrueEliminated,
-                areJumpChainsMerged,
-                isSplitted,
-                isDdgDrawn,
-              )
-            }}
-          />
-          <span className="hover-text">Draw DDG Edges</span>
-        </div>
-        <Editor
-          defaultLanguage="typescript"
-          value={content}
-          onChange={(value) => { onSourceChangeDebounced(value ?? '') }}
-          theme={systemTheme}
-          options={{
-            fontSize: 16,
-            minimap: { enabled: false },
-            scrollbar: {
-              vertical: 'hidden',
-              horizontal: 'hidden',
-            },
-            overviewRulerLanes: 0,
-          }}
-          onMount={() => {
-            onSourceChange(
-              content,
-              areEmptyJumpsEliminated,
-              areEmptyJumpsEliminated,
-              areJumpChainsMerged,
-              isSplitted,
-              isDdgDrawn,
-            )
-          }}
-        />
       </div>
-      <div className="content-container" style={{ height: '86vh', width: '90vh' }}>
+      <div className="content-container" style={{ width: '800px' }}>
         <h2>Control Flow Graph</h2>
-        <ReactFlowProvider>
-          <LayoutFlow />
-        </ReactFlowProvider>
+        <div className="cfg-wrapper">
+          <ReactFlowProvider>
+            <LayoutFlow />
+          </ReactFlowProvider>
+        </div>
       </div>
       {// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         isCfgTextEnabled && (
-          <div className="content-container" style={{ height: '86vh', width: '90vh' }}>
+          <div className="content-container" style={{ width: '400px' }}>
             <h2>Control Flow Graph (Text)</h2>
             <Editor
               defaultLanguage="typescript"
@@ -336,7 +342,7 @@ export const App = () => {
       }
       {// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         isDdgTextEnabled && (
-          <div className="content-container" style={{ height: '86vh', width: '90vh' }}>
+          <div className="content-container" style={{ width: '400px' }}>
             <h2>Data Dependency Graph (Text)</h2>
             <div
               style={{
@@ -354,7 +360,7 @@ export const App = () => {
       }
       {// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         isASTEnabled && (
-          <div className="content-container" style={{ height: '86vh', width: '90vh' }}>
+          <div className="content-container" style={{ width: '400px' }}>
             <h2>Abstract Syntax Tree (Text)</h2>
             <div
               style={{

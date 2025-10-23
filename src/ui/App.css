@@ -12,9 +12,12 @@
 
 .editor-container {
   flex: 1;
-  height: 100%;
   padding: 10px;
   border-right: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
 }
 
 .editor-container h2 {
@@ -35,9 +38,11 @@
 
 .content-container {
   flex: 1;
-  height: 100%;
   padding: 10px;
-  overflow: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .content-container pre {
@@ -70,4 +75,19 @@
 .hover-container:hover .hover-text {
   visibility: visible;
   opacity: 1;
+}
+
+.editor-controls {
+  flex-shrink: 0;
+}
+
+.editor-wrapper {
+  flex-grow: 1;
+  min-height: 0;
+}
+
+.cfg-wrapper {
+  flex-grow: 1;
+  min-height: 0;
+  position: relative;
 }
