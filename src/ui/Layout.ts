@@ -4,7 +4,9 @@ import { type Node, type Edge } from '@xyflow/react'
 export const layout = (nodes: Node[], edges: Edge[]) => {
   const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}))
   g.setGraph({})
-  edges.forEach(edge => g.setEdge(edge.source, edge.target))
+  edges
+    .filter(edge => edge.label != 'depends')
+    .forEach(edge => g.setEdge(edge.source, edge.target))
   nodes.forEach(node => g.setNode(node.id, {
     ...node,
     width: node.measured?.width ?? 0,

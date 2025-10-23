@@ -36,13 +36,16 @@ export const buildDdg = (node: ts.SourceFile): Ddg => {
       }
     }
     else if (ts.isWhileStatement(statement)) {
-      console.log('While statement is unimplemented')
+      console.error('While statement is unimplemented')
+      visit(statement.statement)
     }
     else if (ts.isDoStatement(statement)) {
-      console.log('Do-While statement is unimplemented')
+      console.error('Do-While statement is unimplemented')
+      visit(statement.statement)
     }
     else if (ts.isForStatement(statement)) {
-      console.log('For statement is unimplemented')
+      console.error('For statement is unimplemented')
+      visit(statement.statement)
     }
     else if (ts.isBlock(statement)) {
       scope.push()

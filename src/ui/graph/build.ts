@@ -77,7 +77,7 @@ export const toGraph = (
     let targetHandle = 'target'
     let sourceHandle = 'source'
     if (label == 'depends') {
-      type = 'default'
+      type = 'smart'
       targetHandle += '2'
       sourceHandle += '2'
       animated = false
