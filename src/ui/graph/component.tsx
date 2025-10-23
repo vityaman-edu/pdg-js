@@ -28,7 +28,7 @@ const getEndTextColor = (data: NodeData) => {
 }
 
 export const MultilineNode = ({ data }: { data: NodeData }) => {
-  const isLabelShown = false
+  const isLabelShown = !data.body && data.end == 'jump'
 
   // Theme-based styles
   const isDark = data.theme === 'vs-dark'
