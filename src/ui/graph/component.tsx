@@ -4,7 +4,7 @@ interface NodeData {
   label: string
   body: string
   end: string
-  theme?: 'vs' | 'vs-dark'
+  theme: 'vs' | 'vs-dark'
 }
 
 const getEndBackgroundColor = (data: NodeData) => {
@@ -74,7 +74,6 @@ export const MultilineNode = ({ data }: { data: NodeData }) => {
       </div>
 
       {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         isLabelShown && (
           <div
             style={{

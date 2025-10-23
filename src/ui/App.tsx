@@ -26,8 +26,10 @@ const GraphView = {
 type GraphView = typeof GraphView[keyof typeof GraphView]
 
 export const App = () => {
+  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+
   const [graphView, setGraphView] = useState<GraphView>(GraphView.None)
-  const [systemTheme, setSystemTheme] = useState<'vs' | 'vs-dark'>('vs')
+  const [systemTheme, setSystemTheme] = useState<'vs' | 'vs-dark'>(mediaQuery.matches ? 'vs-dark' : 'vs')
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-arguments
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
