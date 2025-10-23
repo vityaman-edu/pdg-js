@@ -3,6 +3,7 @@ import { forEachBasicBlock, type BasicBlock } from '../../cfg/core'
 import { toStringExpr, toStringStatements } from '../../cfg/text'
 import { isAssignmentExpression, type Assignment, type Ddg } from '../../ddg/core'
 import { visitSimpleStatementVariables } from '../../ddg/visit'
+import seedrandom from 'seedrandom'
 import ts from 'typescript'
 
 export const toGraph = (
@@ -42,15 +43,17 @@ export const toGraph = (
   }
 
   const newEdge = (label: string, source: string, target: string) => {
-    const randomHex = () => {
-      const [min, max] = [3, 11]
-      return (Math.floor(Math.random() * max) + min).toString(16)
+    const randomHex = (rnd: seedrandom.PRNG) => {
+      const [min, max] = [5, 10]
+      return (Math.floor(rnd() * max) + min).toString(16)
     }
 
     const randomColor = () => {
+      const rnd = seedrandom(`${source}-${target}`)
+
       let color = '#'
       for (let i = 0; i < 6; i++) {
-        color += randomHex()
+        color += randomHex(rnd)
       }
       return color
     }
