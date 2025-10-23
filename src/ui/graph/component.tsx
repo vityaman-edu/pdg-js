@@ -27,7 +27,7 @@ const getEndTextColor = (data: NodeData) => {
 }
 
 export const MultilineNode = ({ data }: { data: NodeData }) => {
-  const isLabelShown = false
+  const isLabelShown = true
 
   return (
     <div style={{

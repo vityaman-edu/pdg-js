@@ -1,80 +1,150 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 import ts from 'typescript'
-import { isAssignmentExpression, type Ddg } from './core'
-import { Scope } from './scope'
+import { forEachBasicBlock, type BasicBlock } from '../cfg/core'
+import { isAssignmentExpression, target, type Assignment, type Ddg } from './core'
 import { visitExpressionVariables, visitSimpleStatementVariables } from './visit'
 
-export const buildDdg = (node: ts.SourceFile): Ddg => {
-  const ddg: Ddg = { dependencies: new Map() }
-  const scope = new Scope()
+function areSetEqual<V>(a: Set<V>, b: Set<V>): boolean {
+  if (a.size !== b.size) {
+    return false
+  }
 
-  const visitVariable = (node: ts.Identifier) => {
-    const requirement = scope.lookup(node.text)
-    if (requirement != undefined) {
-      ddg.dependencies.set(node, requirement)
+  for (const item of a) {
+    if (!b.has(item)) {
+      return false
     }
   }
 
-  const visitStatement = (statement: ts.Node) => {
-    if (ts.isVariableStatement(statement)) {
-      visitSimpleStatementVariables(statement, visitVariable)
-      statement.declarationList.declarations.forEach((declaration) => {
-        scope.visit(declaration)
-      })
-    }
-    else if (ts.isExpressionStatement(statement)
-      && isAssignmentExpression(statement.expression)) {
-      visitSimpleStatementVariables(statement, visitVariable)
-      scope.visit(statement.expression)
-    }
-    else if (ts.isIfStatement(statement)) {
-      visitExpressionVariables(statement.expression, visitVariable)
-      {
-        visit(statement.thenStatement)
-      }
-      if (statement.elseStatement != undefined) {
-        visit(statement.elseStatement)
-      }
-    }
-    else if (ts.isWhileStatement(statement)) {
-      console.error('While statement is unimplemented')
-      visit(statement.statement)
-    }
-    else if (ts.isDoStatement(statement)) {
-      console.error('Do-While statement is unimplemented')
-      visit(statement.statement)
-    }
-    else if (ts.isForStatement(statement)) {
-      console.error('For statement is unimplemented')
-      visit(statement.statement)
-    }
-    else if (ts.isBlock(statement)) {
-      scope.push()
-      statement.statements.forEach(visitStatement)
-      scope.pop()
+  return true
+}
+
+function areMapEqual<K, V>(a: Map<K, Set<V>>, b: Map<K, Set<V>>): boolean {
+  if (a.size !== b.size) {
+    return false
+  }
+
+  for (const [ka, va] of a) {
+    const vb = b.get(ka)
+    if (vb == undefined || !areSetEqual(va, vb)) {
+      return false
     }
   }
 
-  const visit = (node: ts.Node) => {
-    if (ts.isSourceFile(node)
-      && node.statements.length == 1
-      && ts.isFunctionDeclaration(node.statements[0])) {
-      if (node.statements[0].body == undefined) {
-        throw Error(`Empty function body`)
-      }
+  return true
+}
 
-      visit(node.statements[0].body)
+function mapCopy<K, V>(a: Map<K, Set<V>>) {
+  const b = new Map<K, Set<V>>()
+  for (const [k, v] of a) {
+    b.set(k, new Set(v))
+  }
+  return b
+}
+
+function mapMerge<K, V>(a: Map<K, Set<V>>, b: Map<K, Set<V>>): Map<K, Set<V>> {
+  const merged = mapCopy(a)
+  for (const [kb, vb] of b) {
+    const va = merged.get(kb) ?? new Set<V>()
+    merged.set(kb, new Set([...va, ...vb]))
+  }
+  return merged
+}
+
+function mapReset<K, V>(a: Map<K, Set<V>>, b: Map<K, Set<V>>) {
+  a.clear()
+  for (const [k, v] of b) {
+    a.set(k, new Set(v))
+  }
+}
+
+export const buildDdg = (cfg: BasicBlock, ids: Map<ts.Identifier, string>): Ddg => {
+  const ddg: Ddg = { dependencies: new Map<ts.Identifier, Set<Assignment>>() }
+
+  const visited = new Set<BasicBlock>()
+
+  const previous = new Map<BasicBlock, Map<string, Set<Assignment>>>()
+  forEachBasicBlock(cfg, (block) => {
+    previous.set(block, new Map<string, Set<Assignment>>())
+  })
+
+  const current = new Map<string, Set<Assignment>>()
+
+  const visitVariable = (variable: ts.Identifier) => {
+    const id = ids.get(variable) ?? '?'
+    const assignments = new Set(current.get(id) ?? new Set<Assignment>())
+    ddg.dependencies.set(variable, assignments)
+    console.debug(`visited variable ${variable.getText()} with id ${id}`)
+    console.debug(assignments)
+  }
+
+  const visit = (block: BasicBlock) => {
+    console.debug(`visit ${block.id}...`)
+
+    if (visited.has(block) && areMapEqual(current, previous.get(block)!)) {
+      console.debug(`no update for ${block.id}`)
       return
     }
 
-    if (ts.isBlock(node) || ts.isSourceFile(node)) {
-      node.forEachChild(visitStatement)
-      return
+    console.debug(`processing ${block.id}`)
+
+    visited.add(block)
+
+    mapReset(current, mapMerge(current, previous.get(block)!))
+    previous.set(block, mapCopy(current))
+
+    for (const statement of block.statements) {
+      console.debug(`processing ${statement.getText()}`)
+
+      visitSimpleStatementVariables(statement, visitVariable)
+
+      if (ts.isVariableStatement(statement)) {
+        statement.declarationList.declarations.forEach((declaration) => {
+          const id = ids.get(target(declaration))
+          if (id == undefined) {
+            console.error(`not found rename for ${target(declaration).getText()}`)
+            return
+          }
+
+          current.set(id, new Set([declaration]))
+          console.debug(`redefine ${target(declaration).getText()} with id ${id}`)
+          console.debug(declaration)
+        })
+      }
+      else if (ts.isExpressionStatement(statement)
+        && isAssignmentExpression(statement.expression)) {
+        const expression = statement.expression
+
+        const id = ids.get(target(expression))
+        if (id == undefined) {
+          console.error(`not found rename for ${target(expression).getText()}`)
+          return
+        }
+
+        current.set(id, new Set([expression]))
+        console.debug(`redefine ${target(expression).getText()} with id ${id}`)
+        console.debug(expression)
+      }
+      else {
+        console.debug(`is not redefinition statement`)
+      }
     }
 
-    visitStatement(node)
+    switch (block.end.kind) {
+      case 'branch': {
+        visitExpressionVariables(block.end.condition, visitVariable)
+        visit(block.end.then)
+        visit(block.end.else)
+      } break
+      case 'jump': {
+        visit(block.end.next)
+      } break
+      case 'return': {
+        visitExpressionVariables(block.end.expression, visitVariable)
+      } break
+    }
   }
 
-  visit(node)
-
+  visit(cfg)
   return ddg
 }

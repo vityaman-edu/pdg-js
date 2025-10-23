@@ -14,6 +14,7 @@ import { toGraph } from './graph/build'
 import { printAst } from '../ast/text'
 import { printDdg } from '../ddg/text'
 import { buildDdg } from '../ddg/build'
+import { physicalNames } from '../ast/rename'
 
 export const App = () => {
   const isCfgTextEnabled = false
@@ -49,7 +50,7 @@ export const App = () => {
       areJumpChainsMerged,
       isSplitted,
     })
-    const ddg = buildDdg(ast)
+    const ddg = buildDdg(cfg, physicalNames(ast))
 
     setAstText(printAst(ast))
     setCfgText(printCfg(cfg))

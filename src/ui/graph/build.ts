@@ -71,22 +71,18 @@ export const toGraph = (
       } break
     }
 
-    let type = 'smart'
     let strokeWidth = 4
-    let animated = true
     let targetHandle = 'target'
     let sourceHandle = 'source'
     if (label == 'depends') {
-      type = 'smart'
       targetHandle += '2'
       sourceHandle += '2'
-      animated = false
       strokeWidth = 2
     }
 
     return {
       id: newId(),
-      type: type,
+      type: 'smart',
       source,
       target,
       markerEnd: {
@@ -100,7 +96,6 @@ export const toGraph = (
       },
       targetHandle: targetHandle,
       sourceHandle: sourceHandle,
-      animated: animated,
     } as Edge
   }
 
@@ -152,20 +147,17 @@ export const toGraph = (
   forEachBasicBlock(entry, (block: BasicBlock) => {
     block.statements.forEach((statement) => {
       visitSimpleStatementVariables(statement, (variable) => {
-        const assignment = ddg.dependencies.get(variable)
-        if (assignment == undefined) {
-          return
-        }
+        ddg.dependencies.get(variable)?.forEach((assignment) => {
+          const source = block
+          const target = blockByAssignment.get(assignment)
+          if (target == undefined) {
+            return
+          }
 
-        const source = block
-        const target = blockByAssignment.get(assignment)
-        if (target == undefined) {
-          return
-        }
-
-        const sourceId = idByBlock.get(source) ?? ''
-        const targetId = idByBlock.get(target) ?? ''
-        edges.push(newEdge('depends', sourceId, targetId))
+          const sourceId = idByBlock.get(source) ?? ''
+          const targetId = idByBlock.get(target) ?? ''
+          edges.push(newEdge('depends', sourceId, targetId))
+        })
       })
     })
   })

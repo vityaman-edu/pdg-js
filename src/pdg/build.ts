@@ -27,17 +27,14 @@ export const buildDdg = (cfg: BasicBlock, ddg: Ddg): Pdg => {
 
   const visitExpression = (block: BasicBlock, expression: ts.Expression) => {
     referencedVariables(expression).forEach((variable) => {
-      const dependency = ddg.dependencies.get(variable)
-      if (dependency == undefined) {
-        throw Error(`Dependency not found for ${variable.getText()}`)
-      }
+      ddg.dependencies.get(variable)?.forEach((dependency) => {
+        const requirement = blockByNode.get(dependency)
+        if (requirement == undefined) {
+          throw Error(`Block not found for ${variable.getText()}`)
+        }
 
-      const requirement = blockByNode.get(dependency)
-      if (requirement == undefined) {
-        throw Error(`Block not found for ${variable.getText()}`)
-      }
-
-      pdg.dependenciesByBasicBlock.get(block.id)?.add(requirement)
+        pdg.dependenciesByBasicBlock.get(block.id)?.add(requirement)
+      })
     })
   }
 
