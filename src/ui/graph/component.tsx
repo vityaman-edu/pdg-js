@@ -4,6 +4,7 @@ interface NodeData {
   label: string
   body: string
   end: string
+  theme?: 'vs' | 'vs-dark'
 }
 
 const getEndBackgroundColor = (data: NodeData) => {
@@ -29,15 +30,24 @@ const getEndTextColor = (data: NodeData) => {
 export const MultilineNode = ({ data }: { data: NodeData }) => {
   const isLabelShown = false
 
+  // Theme-based styles
+  const isDark = data.theme === 'vs-dark'
+  const nodeBackgroundColor = isDark ? '#2d2d2d' : '#f5f5f5'
+  const nodeBorderColor = isDark ? '#555' : '#333'
+  const labelBackgroundColor = isDark ? '#444' : '#333'
+  const handleBackgroundColor = isDark ? '#666' : '#555'
+  const endBorderColor = isDark ? '#555' : '#333'
+  const boxShadow = isDark ? '0 4px 6px rgba(0, 0, 0, 0.3)' : '0 4px 6px rgba(0, 0, 0, 0.1)'
+
   return (
     <div style={{
-      border: '2px solid #333',
+      border: `2px solid ${nodeBorderColor}`,
       borderRadius: 8,
-      backgroundColor: '#f5f5f5',
+      backgroundColor: nodeBackgroundColor,
       minWidth: 200,
       maxWidth: 300,
       overflow: 'hidden',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      boxShadow,
     }}
     >
       <div style={{
@@ -51,14 +61,14 @@ export const MultilineNode = ({ data }: { data: NodeData }) => {
           type="target"
           position={Position.Top}
           isConnectable={true}
-          style={{ background: '#555', left: '25%' }}
+          style={{ background: handleBackgroundColor, left: '25%' }}
           id="target"
         />
         <Handle
           type="source"
           position={Position.Top}
           isConnectable={true}
-          style={{ background: '#555', left: '75%' }}
+          style={{ background: handleBackgroundColor, left: '75%' }}
           id="source2"
         />
       </div>
@@ -68,7 +78,7 @@ export const MultilineNode = ({ data }: { data: NodeData }) => {
         isLabelShown && (
           <div
             style={{
-              backgroundColor: '#333',
+              backgroundColor: labelBackgroundColor,
               color: 'white',
               padding: '4px 4px',
               fontWeight: 'bold',
@@ -101,7 +111,7 @@ export const MultilineNode = ({ data }: { data: NodeData }) => {
             padding: '4px 4px',
             fontWeight: 'bold',
             fontSize: 14,
-            borderTop: '1px solid #333',
+            borderTop: `1px solid ${endBorderColor}`,
             textAlign: 'center',
           }}
         >
@@ -119,14 +129,14 @@ export const MultilineNode = ({ data }: { data: NodeData }) => {
           type="source"
           position={Position.Bottom}
           isConnectable={true}
-          style={{ background: '#555', left: '25%' }}
+          style={{ background: handleBackgroundColor, left: '25%' }}
           id="source"
         />
         <Handle
           type="target"
           position={Position.Bottom}
           isConnectable={true}
-          style={{ background: '#555', left: '75%' }}
+          style={{ background: handleBackgroundColor, left: '75%' }}
           id="target2"
         />
       </div>

@@ -50,6 +50,18 @@ export const App = () => {
     }
   }, [])
 
+  // Redraw graph when theme changes
+  useEffect(() => {
+    onSourceChange(
+      content,
+      areEmptyJumpsEliminated,
+      areIfTrueEliminated,
+      areJumpChainsMerged,
+      isSplitted,
+      isDdgDrawn,
+    )
+  }, [systemTheme]) // Only depend on systemTheme to avoid circular dependencies
+
   const onSourceChange = useCallback((
     source: string,
     areEmptyJumpsEliminated: boolean,
@@ -71,10 +83,10 @@ export const App = () => {
     setCfgText(printCfg(cfg))
     setDdgText(printDdg(ddg))
 
-    const { nodes, edges } = toGraph(cfg, isDdgDrawn ? ddg : undefined)
+    const { nodes, edges } = toGraph(cfg, isDdgDrawn ? ddg : undefined, systemTheme)
     setNodes(nodes)
     setEdges(edges)
-  }, [setEdges, setNodes])
+  }, [setEdges, setNodes, systemTheme])
 
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const onSourceChangeDebounced = useCallback((source: string) => {
@@ -113,11 +125,12 @@ export const App = () => {
     return (
       <div style={{ height: '100%', width: '100%' }}>
         <ReactFlow
+          colorMode="system"
           nodes={layouted}
           edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
-          nodeTypes={{ multiline: MultilineNode }}
+          nodeTypes={{ multiline: props => <MultilineNode {...props} /> }}
           edgeTypes={{ smart: SmartBezierEdge }}
           fitView
           fitViewOptions={{
@@ -140,7 +153,15 @@ export const App = () => {
       <div className="editor-container" style={{ height: '80vh', width: '80vh' }}>
         <h2>Editor</h2>
         <select
-          style={{ marginLeft: '10px' }}
+          style={{
+            marginLeft: '10px',
+            backgroundColor: systemTheme === 'vs-dark' ? '#333' : '#f9f9f9',
+            color: systemTheme === 'vs-dark' ? '#fff' : '#000',
+            border: `1px solid ${systemTheme === 'vs-dark' ? '#555' : '#ccc'}`,
+            borderRadius: '4px',
+            padding: '5px',
+            fontSize: '14px',
+          }}
           onChange={(e) => {
             const source = examples[e.target.value] ?? ''
             setContent(source)

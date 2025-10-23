@@ -9,6 +9,7 @@ import ts from 'typescript'
 export const toGraph = (
   entry: BasicBlock,
   ddg: Ddg | undefined = undefined,
+  theme: 'vs' | 'vs-dark' = 'vs',
 ) => {
   let id = 1
   const newId = () => {
@@ -37,6 +38,7 @@ export const toGraph = (
         label: block.id,
         body: toStringStatements(block.statements),
         end: end,
+        theme, // Pass theme to the node
       },
       position: { x: 0, y: 0 },
     }
@@ -58,13 +60,19 @@ export const toGraph = (
       return color
     }
 
-    let color = '#6c757d'
+    // Theme-based colors
+    const isDark = theme === 'vs-dark'
+    const defaultColor = isDark ? '#a0a0a0' : '#6c757d'
+    const thenColor = isDark ? '#4caf50' : '#28a745'
+    const elseColor = isDark ? '#f44336' : '#dc3545'
+
+    let color = defaultColor
     switch (label) {
       case 'then': {
-        color = '#28a745'
+        color = thenColor
       } break
       case 'else': {
-        color = '#dc3545'
+        color = elseColor
       } break
       case 'depends': {
         color = randomColor()
