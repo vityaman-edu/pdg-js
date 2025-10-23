@@ -21,6 +21,7 @@ export const App = () => {
   const isDdgTextEnabled = true
   const isASTEnabled = false
 
+  const [systemTheme, setSystemTheme] = useState<'vs' | 'vs-dark'>('vs')
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-arguments
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
@@ -34,6 +35,20 @@ export const App = () => {
   const [areJumpChainsMerged, setJumpChainsMerged] = useState(true)
   const [isSplitted, setSplitted] = useState(false)
   const [isDdgDrawn, setDdgDrawn] = useState(false)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    setSystemTheme(mediaQuery.matches ? 'vs-dark' : 'vs')
+
+    const handler = (e: MediaQueryListEvent) => {
+      setSystemTheme(e.matches ? 'vs-dark' : 'vs')
+    }
+
+    mediaQuery.addEventListener('change', handler)
+    return () => {
+      mediaQuery.removeEventListener('change', handler)
+    }
+  }, [])
 
   const onSourceChange = useCallback((
     source: string,
@@ -248,6 +263,7 @@ export const App = () => {
           defaultLanguage="typescript"
           value={content}
           onChange={(value) => { onSourceChangeDebounced(value ?? '') }}
+          theme={systemTheme}
           options={{
             fontSize: 16,
             minimap: { enabled: false },
@@ -282,6 +298,7 @@ export const App = () => {
             <Editor
               defaultLanguage="typescript"
               value={cfgText}
+              theme={systemTheme}
               options={{
                 fontSize: 16,
                 minimap: { enabled: false },
