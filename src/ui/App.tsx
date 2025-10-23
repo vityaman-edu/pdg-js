@@ -295,7 +295,7 @@ export const App = () => {
             onChange={(value) => { onSourceChangeDebounced(value ?? '') }}
             theme={systemTheme}
             options={{
-              fontSize: 16,
+              fontSize: 22,
               minimap: { enabled: false },
               scrollbar: {
                 vertical: 'hidden',
@@ -316,7 +316,7 @@ export const App = () => {
           />
         </div>
       </div>
-      <div className="content-container" style={{ width: '800px' }}>
+      <div className="content-container" style={{ width: '880px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <h2>Control Flow Graph</h2>
           <select
