@@ -45,6 +45,14 @@ export const MultilineNode = ({ data }: { data: NodeData }) => {
         position={Position.Top}
         isConnectable={true}
         style={{ background: '#555' }}
+        id="target"
+      />
+      <Handle
+        type="source"
+        position={Position.Right}
+        isConnectable={true}
+        style={{ background: '#555' }}
+        id="source2"
       />
 
       {
@@ -97,6 +105,14 @@ export const MultilineNode = ({ data }: { data: NodeData }) => {
         position={Position.Bottom}
         isConnectable={true}
         style={{ background: '#555' }}
+        id="source"
+      />
+      <Handle
+        type="target"
+        position={Position.Right}
+        isConnectable={true}
+        style={{ background: '#555' }}
+        id="target2"
       />
     </div>
   )

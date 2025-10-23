@@ -4,6 +4,13 @@ console.log('Hello, World!')
 console.log('Sorry, I have a boyfriend.')
 `,
 
+  'Linear': `
+let a = 1
+let b = a
+let c = a + b
+a = c + b
+`,
+
   'Fibonacci': `
 function fibonacciIterative(n: number): number {
   if (n < 0) {

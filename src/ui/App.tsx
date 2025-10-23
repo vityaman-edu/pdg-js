@@ -10,14 +10,14 @@ import { layout } from './Layout'
 import { MultilineNode } from './graph/component'
 import { buildCfg } from '../cfg/build'
 import { printCfg } from '../cfg/text'
-import { toGraph } from './graph/cfg'
+import { toGraph } from './graph/build'
 import { printAst } from '../ast/text'
 import { printDdg } from '../ddg/text'
 import { buildDdg } from '../ddg/build'
 
 export const App = () => {
   const isCfgTextEnabled = false
-  const isDdgTextEnabled = false
+  const isDdgTextEnabled = true
   const isASTEnabled = false
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
@@ -32,6 +32,7 @@ export const App = () => {
   const [areIfTrueEliminated, setIfTrueEliminated] = useState(true)
   const [areJumpChainsMerged, setJumpChainsMerged] = useState(true)
   const [isSplitted, setSplitted] = useState(false)
+  const [isDdgDrawn, setDdgDrawn] = useState(false)
 
   const onSourceChange = useCallback((
     source: string,
@@ -39,6 +40,7 @@ export const App = () => {
     areIfTrueEliminated: boolean,
     areJumpChainsMerged: boolean,
     isSplitted: boolean,
+    isDdgDrawn: boolean,
   ) => {
     const ast = buildAst(source)
     const cfg = buildCfg(ast, {
@@ -53,7 +55,7 @@ export const App = () => {
     setCfgText(printCfg(cfg))
     setDdgText(printDdg(ddg))
 
-    const { nodes, edges } = toGraph(cfg)
+    const { nodes, edges } = toGraph(cfg, isDdgDrawn ? ddg : undefined)
     setNodes(nodes)
     setEdges(edges)
   }, [setEdges, setNodes])
@@ -71,15 +73,10 @@ export const App = () => {
         areIfTrueEliminated,
         areJumpChainsMerged,
         isSplitted,
+        isDdgDrawn,
       )
     }, 300)
-  }, [
-    areEmptyJumpsEliminated,
-    areIfTrueEliminated,
-    areJumpChainsMerged,
-    isSplitted,
-    onSourceChange,
-  ])
+  }, [areEmptyJumpsEliminated, areIfTrueEliminated, areJumpChainsMerged, isDdgDrawn, isSplitted, onSourceChange])
 
   const LayoutFlow = () => {
     const useLayout = () => {
@@ -137,6 +134,7 @@ export const App = () => {
               areIfTrueEliminated,
               areJumpChainsMerged,
               isSplitted,
+              isDdgDrawn,
             )
           }}
           defaultValue="Hello World"
@@ -159,6 +157,7 @@ export const App = () => {
                 areIfTrueEliminated,
                 areJumpChainsMerged,
                 isSplitted,
+                isDdgDrawn,
               )
             }}
           />
@@ -178,6 +177,7 @@ export const App = () => {
                 areIfTrueEliminated,
                 areJumpChainsMerged,
                 isSplitted,
+                isDdgDrawn,
               )
             }}
           />
@@ -197,6 +197,7 @@ export const App = () => {
                 areIfTrueEliminated,
                 areJumpChainsMerged,
                 isSplitted,
+                isDdgDrawn,
               )
             }}
           />
@@ -216,10 +217,31 @@ export const App = () => {
                 areIfTrueEliminated,
                 areJumpChainsMerged,
                 isSplitted,
+                isDdgDrawn,
               )
             }}
           />
           <span className="hover-text">Split CFG</span>
+        </div>
+        <div className="hover-container">
+          <input
+            className="hover-input"
+            type="checkbox"
+            checked={isDdgDrawn}
+            onChange={(e) => {
+              const isDdgDrawn = e.target.checked
+              setDdgDrawn(isDdgDrawn)
+              onSourceChange(
+                content,
+                areEmptyJumpsEliminated,
+                areIfTrueEliminated,
+                areJumpChainsMerged,
+                isSplitted,
+                isDdgDrawn,
+              )
+            }}
+          />
+          <span className="hover-text">Draw DDG Edges</span>
         </div>
         <Editor
           defaultLanguage="typescript"
@@ -241,6 +263,7 @@ export const App = () => {
               areEmptyJumpsEliminated,
               areJumpChainsMerged,
               isSplitted,
+              isDdgDrawn,
             )
           }}
         />

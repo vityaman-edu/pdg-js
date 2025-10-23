@@ -1,60 +1,33 @@
 import ts from 'typescript'
 import { isAssignmentExpression, type Ddg } from './core'
 import { Scope } from './scope'
-
-export const referencedVariables = (node: ts.Expression): ts.Identifier[] => {
-  const ids: ts.Identifier[] = []
-
-  const visitExpression = (node: ts.Node) => {
-    if (isAssignmentExpression(node)) {
-      throw Error(`assignment expression is unsupported`)
-    }
-
-    if (ts.isIdentifier(node)) {
-      ids.push(node)
-      return
-    }
-
-    node.forEachChild(visitExpression)
-  }
-
-  visitExpression(node)
-  return ids
-}
+import { visitExpressionVariables, visitSimpleStatementVariables } from './visit'
 
 export const buildDdg = (node: ts.SourceFile): Ddg => {
   const ddg: Ddg = { dependencies: new Map() }
   const scope = new Scope()
 
-  const visitExpression = (node: ts.Expression | undefined) => {
-    if (node == undefined) {
-      return
+  const visitVariable = (node: ts.Identifier) => {
+    const requirement = scope.lookup(node.text)
+    if (requirement != undefined) {
+      ddg.dependencies.set(node, requirement)
     }
-
-    referencedVariables(node).forEach((node) => {
-      const requirement = scope.lookup(node.text)
-      if (requirement != undefined) {
-        ddg.dependencies.set(node, requirement)
-      }
-    })
   }
 
   const visitStatement = (statement: ts.Node) => {
     if (ts.isVariableStatement(statement)) {
+      visitSimpleStatementVariables(statement, visitVariable)
       statement.declarationList.declarations.forEach((declaration) => {
-        visitExpression(declaration.initializer)
         scope.visit(declaration)
       })
     }
     else if (ts.isExpressionStatement(statement)
       && isAssignmentExpression(statement.expression)) {
-      const expr = statement.expression
-
-      visitExpression(expr.right)
-      scope.visit(expr)
+      visitSimpleStatementVariables(statement, visitVariable)
+      scope.visit(statement.expression)
     }
     else if (ts.isIfStatement(statement)) {
-      visitExpression(statement.expression)
+      visitExpressionVariables(statement.expression, visitVariable)
       {
         visit(statement.thenStatement)
       }

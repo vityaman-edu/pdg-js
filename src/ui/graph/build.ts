@@ -1,8 +1,14 @@
 import { type Edge, MarkerType, type Node } from '@xyflow/react'
 import { forEachBasicBlock, type BasicBlock } from '../../cfg/core'
 import { toStringExpr, toStringStatements } from '../../cfg/text'
+import { isAssignmentExpression, type Assignment, type Ddg } from '../../ddg/core'
+import { visitSimpleStatementVariables } from '../../ddg/visit'
+import ts from 'typescript'
 
-export const toGraph = (entry: BasicBlock) => {
+export const toGraph = (
+  entry: BasicBlock,
+  ddg: Ddg | undefined = undefined,
+) => {
   let id = 1
   const newId = () => {
     id += 1
@@ -44,6 +50,20 @@ export const toGraph = (entry: BasicBlock) => {
       case 'else': {
         color = '#dc3545'
       } break
+      case 'depends': {
+        color = '#6c69b8ff'
+      } break
+    }
+
+    let strokeWidth = 4
+    let animated = true
+    let targetHandle = 'target'
+    let sourceHandle = 'source'
+    if (label == 'depends') {
+      targetHandle += '2'
+      sourceHandle += '2'
+      animated = false
+      strokeWidth = 2
     }
 
     return {
@@ -57,9 +77,12 @@ export const toGraph = (entry: BasicBlock) => {
       },
       label: label,
       style: {
-        strokeWidth: 3,
+        strokeWidth: strokeWidth,
         stroke: color,
       },
+      targetHandle: targetHandle,
+      sourceHandle: sourceHandle,
+      animated: animated,
     }
   }
 
@@ -67,7 +90,6 @@ export const toGraph = (entry: BasicBlock) => {
   const edges: Edge[] = []
 
   const idByBlock = new Map<BasicBlock, string>()
-
   forEachBasicBlock(entry, (block: BasicBlock) => {
     const node = newNode(block)
     nodes.push(node)
@@ -89,6 +111,45 @@ export const toGraph = (entry: BasicBlock) => {
         edges.push(newEdge('else', source, elseTarget))
       } break
     }
+  })
+
+  const blockByAssignment = new Map<Assignment, BasicBlock>()
+  forEachBasicBlock(entry, (block: BasicBlock) => {
+    block.statements.forEach((statement) => {
+      if (ts.isVariableStatement(statement)) {
+        statement.declarationList.declarations.forEach((declaration) => {
+          blockByAssignment.set(declaration, block)
+        })
+      }
+      else if (ts.isExpressionStatement(statement) && isAssignmentExpression(statement.expression)) {
+        blockByAssignment.set(statement.expression, block)
+      }
+    })
+  })
+
+  if (ddg == undefined) {
+    return { nodes, edges }
+  }
+
+  forEachBasicBlock(entry, (block: BasicBlock) => {
+    block.statements.forEach((statement) => {
+      visitSimpleStatementVariables(statement, (variable) => {
+        const assignment = ddg.dependencies.get(variable)
+        if (assignment == undefined) {
+          return
+        }
+
+        const source = block
+        const target = blockByAssignment.get(assignment)
+        if (target == undefined) {
+          return
+        }
+
+        const sourceId = idByBlock.get(source) ?? ''
+        const targetId = idByBlock.get(target) ?? ''
+        edges.push(newEdge('depends', sourceId, targetId))
+      })
+    })
   })
 
   return { nodes, edges }

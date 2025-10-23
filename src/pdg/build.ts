@@ -2,7 +2,7 @@ import ts from 'typescript'
 import { forEachBasicBlock, type BasicBlock } from '../cfg/core'
 import { isAssignmentExpression, type Ddg } from '../ddg/core'
 import type { Pdg } from './core'
-import { referencedVariables } from '../ddg/build'
+import { referencedVariables } from '../ddg/visit'
 
 export const buildDdg = (cfg: BasicBlock, ddg: Ddg): Pdg => {
   const pdg: Pdg = { dependenciesByBasicBlock: new Map() }
