@@ -42,6 +42,19 @@ export const toGraph = (
   }
 
   const newEdge = (label: string, source: string, target: string) => {
+    const randomHex = () => {
+      const [min, max] = [3, 11]
+      return (Math.floor(Math.random() * max) + min).toString(16)
+    }
+
+    const randomColor = () => {
+      let color = '#'
+      for (let i = 0; i < 6; i++) {
+        color += randomHex()
+      }
+      return color
+    }
+
     let color = '#6c757d'
     switch (label) {
       case 'then': {
@@ -51,15 +64,17 @@ export const toGraph = (
         color = '#dc3545'
       } break
       case 'depends': {
-        color = '#6c69b8ff'
+        color = randomColor()
       } break
     }
 
+    let type = 'smart'
     let strokeWidth = 4
     let animated = true
     let targetHandle = 'target'
     let sourceHandle = 'source'
     if (label == 'depends') {
+      type = 'default'
       targetHandle += '2'
       sourceHandle += '2'
       animated = false
@@ -68,7 +83,7 @@ export const toGraph = (
 
     return {
       id: newId(),
-      type: 'smart',
+      type: type,
       source,
       target,
       markerEnd: {
@@ -83,7 +98,7 @@ export const toGraph = (
       targetHandle: targetHandle,
       sourceHandle: sourceHandle,
       animated: animated,
-    }
+    } as Edge
   }
 
   const nodes: Node[] = []
