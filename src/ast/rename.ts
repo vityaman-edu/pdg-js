@@ -66,6 +66,15 @@ export const physicalNames = (node: ts.SourceFile): Map<ts.Identifier, string> =
 
       names.set(node, physical)
     }
+    else if (ts.isVariableDeclarationList(node)) {
+      visitSimpleStatementVariables(node, visit)
+      node.declarations.forEach((declaration) => {
+        if (ts.isIdentifier(declaration.name)) {
+          scope.visit(declaration.name)
+          visit(declaration.name)
+        }
+      })
+    }
     else if (ts.isVariableStatement(node)) {
       visitSimpleStatementVariables(node, visit)
       node.declarationList.declarations.forEach((declaration) => {

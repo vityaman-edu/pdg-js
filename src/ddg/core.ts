@@ -3,6 +3,7 @@ import * as ts from 'typescript'
 export type Assignment
   = ts.VariableDeclaration
     | ts.BinaryExpression
+    | ts.PostfixUnaryExpression
 
 export interface Ddg {
   dependencies: Map<ts.Identifier, Set<Assignment>>

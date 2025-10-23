@@ -131,13 +131,21 @@ export const toGraph = (
   const blockByAssignment = new Map<Assignment, BasicBlock>()
   forEachBasicBlock(entry, (block: BasicBlock) => {
     block.statements.forEach((statement) => {
-      if (ts.isVariableStatement(statement)) {
+      if (ts.isVariableDeclarationList(statement)) {
+        statement.declarations.forEach((declaration) => {
+          blockByAssignment.set(declaration, block)
+        })
+      }
+      else if (ts.isVariableStatement(statement)) {
         statement.declarationList.declarations.forEach((declaration) => {
           blockByAssignment.set(declaration, block)
         })
       }
       else if (ts.isExpressionStatement(statement) && isAssignmentExpression(statement.expression)) {
         blockByAssignment.set(statement.expression, block)
+      }
+      else if (ts.isPostfixUnaryExpression(statement)) {
+        blockByAssignment.set(statement, block)
       }
     })
   })

@@ -74,19 +74,12 @@ export const buildDdg = (cfg: BasicBlock, ids: Map<ts.Identifier, string>): Ddg 
     const id = ids.get(variable) ?? '?'
     const assignments = new Set(current.get(id) ?? new Set<Assignment>())
     ddg.dependencies.set(variable, assignments)
-    console.debug(`visited variable ${variable.getText()} with id ${id}`)
-    console.debug(assignments)
   }
 
   const visit = (block: BasicBlock) => {
-    console.debug(`visit ${block.id}...`)
-
     if (visited.has(block) && areMapEqual(current, previous.get(block)!)) {
-      console.debug(`no update for ${block.id}`)
       return
     }
-
-    console.debug(`processing ${block.id}`)
 
     visited.add(block)
 
@@ -94,39 +87,32 @@ export const buildDdg = (cfg: BasicBlock, ids: Map<ts.Identifier, string>): Ddg 
     previous.set(block, mapCopy(current))
 
     for (const statement of block.statements) {
-      console.debug(`processing ${statement.getText()}`)
-
       visitSimpleStatementVariables(statement, visitVariable)
 
-      if (ts.isVariableStatement(statement)) {
-        statement.declarationList.declarations.forEach((declaration) => {
-          const id = ids.get(target(declaration))
-          if (id == undefined) {
-            console.error(`not found rename for ${target(declaration).getText()}`)
-            return
-          }
-
+      if (ts.isVariableDeclarationList(statement)) {
+        statement.declarations.forEach((declaration) => {
+          const id = ids.get(target(declaration)) ?? '?'
           current.set(id, new Set([declaration]))
-          console.debug(`redefine ${target(declaration).getText()} with id ${id}`)
-          console.debug(declaration)
+          console.debug(id, declaration)
+        })
+      }
+      else if (ts.isVariableStatement(statement)) {
+        statement.declarationList.declarations.forEach((declaration) => {
+          const id = ids.get(target(declaration)) ?? ''
+          current.set(id, new Set([declaration]))
         })
       }
       else if (ts.isExpressionStatement(statement)
         && isAssignmentExpression(statement.expression)) {
         const expression = statement.expression
-
-        const id = ids.get(target(expression))
-        if (id == undefined) {
-          console.error(`not found rename for ${target(expression).getText()}`)
-          return
-        }
-
+        const id = ids.get(target(expression)) ?? ''
         current.set(id, new Set([expression]))
-        console.debug(`redefine ${target(expression).getText()} with id ${id}`)
-        console.debug(expression)
       }
-      else {
-        console.debug(`is not redefinition statement`)
+      else if (ts.isPostfixUnaryExpression(statement)
+        && ts.isIdentifier(statement.operand)) {
+        const expression = statement.operand
+        const id = ids.get(expression) ?? ''
+        current.set(id, new Set([statement]))
       }
     }
 

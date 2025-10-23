@@ -38,12 +38,20 @@ export const visitSimpleStatementVariables = (
   node: ts.Node,
   visit: (id: ts.Identifier) => void,
 ) => {
-  if (ts.isVariableStatement(node)) {
+  if (ts.isVariableDeclarationList(node)) {
+    node.declarations.forEach((declaration) => {
+      visitExpressionVariables(declaration.initializer, visit)
+    })
+  }
+  else if (ts.isVariableStatement(node)) {
     node.declarationList.declarations.forEach((declaration) => {
       visitExpressionVariables(declaration.initializer, visit)
     })
   }
   else if (ts.isExpressionStatement(node) && isAssignmentExpression(node.expression)) {
     visitExpressionVariables(node.expression.right, visit)
+  }
+  else if (ts.isPostfixUnaryExpression(node)) {
+    visitExpressionVariables(node.operand, visit)
   }
 }

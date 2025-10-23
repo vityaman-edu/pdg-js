@@ -13,7 +13,12 @@ export const buildDdg = (cfg: BasicBlock, ddg: Ddg): Pdg => {
   const blockByNode = new Map<ts.Node, string>()
   forEachBasicBlock(cfg, (block) => {
     block.statements.forEach((statement) => {
-      if (ts.isVariableStatement(statement)) {
+      if (ts.isVariableDeclarationList(statement)) {
+        statement.declarations.forEach((declaration) => {
+          blockByNode.set(declaration, block.id)
+        })
+      }
+      else if (ts.isVariableStatement(statement)) {
         statement.declarationList.declarations.forEach((declaration) => {
           blockByNode.set(declaration, block.id)
         })
@@ -21,6 +26,10 @@ export const buildDdg = (cfg: BasicBlock, ddg: Ddg): Pdg => {
       else if (ts.isExpressionStatement(statement)
         && isAssignmentExpression(statement.expression)) {
         blockByNode.set(statement.expression, block.id)
+      }
+      else if (ts.isPostfixUnaryExpression(statement)
+        && ts.isIdentifier(statement.operand)) {
+        blockByNode.set(statement, block.id)
       }
     })
   })
@@ -40,7 +49,16 @@ export const buildDdg = (cfg: BasicBlock, ddg: Ddg): Pdg => {
 
   forEachBasicBlock(cfg, (block) => {
     block.statements.forEach((statement) => {
-      if (ts.isVariableStatement(statement)) {
+      if (ts.isVariableDeclarationList(statement)) {
+        statement.declarations.forEach((declaration) => {
+          if (declaration.initializer == undefined) {
+            return
+          }
+
+          visitExpression(block, declaration.initializer)
+        })
+      }
+      else if (ts.isVariableStatement(statement)) {
         statement.declarationList.declarations.forEach((declaration) => {
           if (declaration.initializer == undefined) {
             return
@@ -52,6 +70,10 @@ export const buildDdg = (cfg: BasicBlock, ddg: Ddg): Pdg => {
       else if (ts.isExpressionStatement(statement)
         && isAssignmentExpression(statement.expression)) {
         visitExpression(block, statement.expression.right)
+      }
+      else if (ts.isPostfixUnaryExpression(statement)
+        && ts.isIdentifier(statement.operand)) {
+        visitExpression(block, statement.operand)
       }
     })
   })
