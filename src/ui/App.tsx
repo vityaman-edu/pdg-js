@@ -160,7 +160,7 @@ export const App = () => {
     <div className="app-container">
       <div className="editor-container" style={{ width: '800px' }}>
         <div className="editor-controls">
-          <img src="public/pdg-js.png" alt="logo" style={{ height: '76px' }} />
+          <img src="/pdg-js/public/pdg-js.png" alt="logo" style={{ height: '76px' }} />
           <select
             style={{
               marginLeft: '10px',
