@@ -5,11 +5,7 @@ import { forEachBasicBlock, type BasicBlock } from '../cfg/core'
 import { isAssignmentExpression, target, type Assignment, type Ddg } from './core'
 import { visitExpressionVariables, visitSimpleStatementVariables } from './visit'
 
-function areSetEqual<V>(a: Set<V>, b: Set<V>): boolean {
-  if (a.size !== b.size) {
-    return false
-  }
-
+function isSetSubsetOf<V>(b: Set<V>, a: Set<V>): boolean {
   for (const item of a) {
     if (!b.has(item)) {
       return false
@@ -19,14 +15,10 @@ function areSetEqual<V>(a: Set<V>, b: Set<V>): boolean {
   return true
 }
 
-function areMapEqual<K, V>(a: Map<K, Set<V>>, b: Map<K, Set<V>>): boolean {
-  if (a.size !== b.size) {
-    return false
-  }
-
+function isMapSubsetOf<K, V>(b: Map<K, Set<V>>, a: Map<K, Set<V>>): boolean {
   for (const [ka, va] of a) {
     const vb = b.get(ka)
-    if (vb == undefined || !areSetEqual(va, vb)) {
+    if (vb == undefined || !isSetSubsetOf(vb, va)) {
       return false
     }
   }
@@ -76,8 +68,17 @@ export const buildDdg = (cfg: BasicBlock, ids: Map<ts.Identifier, string>): Ddg 
     ddg.dependencies.set(variable, assignments)
   }
 
+  const limit = 1000
+  let iteration = 0
+
   const visit = (block: BasicBlock) => {
-    if (visited.has(block) && areMapEqual(current, previous.get(block)!)) {
+    iteration += 1
+    if (limit <= iteration) {
+      console.error('DDG depth limit exceeded')
+      return
+    }
+
+    if (visited.has(block) && isMapSubsetOf(previous.get(block)!, current)) {
       return
     }
 
@@ -93,7 +94,6 @@ export const buildDdg = (cfg: BasicBlock, ids: Map<ts.Identifier, string>): Ddg 
         statement.declarations.forEach((declaration) => {
           const id = ids.get(target(declaration)) ?? '?'
           current.set(id, new Set([declaration]))
-          console.debug(id, declaration)
         })
       }
       else if (ts.isVariableStatement(statement)) {
