@@ -3,18 +3,18 @@ import { MultiSet } from 'mnemonist'
 
 export const split = (entry: BasicBlock): BasicBlock => {
   forEachBasicBlock(entry, (block) => {
-    if (block.statements.length <= 1) {
+    if (block.statements.length < 1) {
       return
     }
 
     const end = block.end
 
     const blocks: BasicBlock[] = [block]
-    for (let i = 1; i < block.statements.length; ++i) {
+    for (let i = 1; i < block.statements.length + 1; ++i) {
       const newbie: BasicBlock = {
         id: `${block.id}${i.toString()}`,
         parents: new MultiSet(),
-        statements: [block.statements[i]],
+        statements: (i < block.statements.length) ? [block.statements[i]] : [],
         end: invalidTransition(),
       }
       newbie.parents.add(blocks[i - 1])

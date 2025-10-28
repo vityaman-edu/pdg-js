@@ -426,6 +426,8 @@ export const buildCfg = (node: ts.SourceFile, options?: BuildCfgOptions): BasicB
   if (options?.isSplitted ?? false) {
     result = split(result)
     result = validate(result)
+    result = eliminateEmptyJumps(result)
+    result = validate(result)
   }
 
   return result

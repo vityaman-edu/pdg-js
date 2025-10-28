@@ -38,6 +38,10 @@ Program Dependence Graph for the TypeScript.
 - [x] Separate tests
 - [x] Refresh on test choice
 - [x] `if {} else if {} else {}`
-- [ ] Data dependencies
+- [x] Data dependencies
 - [x] Merge Basic Blocks
-- [ ] Support exceptions
+- [x] Support exceptions
+- [x] Fix split statements and condition
+- [ ] Support data dependencies from condition
+- [ ] Support data dependencies from condition
+- [ ] Support data dependencies from string literal
