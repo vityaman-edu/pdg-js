@@ -42,6 +42,6 @@ Program Dependence Graph for the TypeScript.
 - [x] Merge Basic Blocks
 - [x] Support exceptions
 - [x] Fix split statements and condition
-- [ ] Support data dependencies from condition
-- [ ] Support data dependencies from condition
+- [x] Support data dependencies from condition
 - [ ] Support data dependencies from string literal
+- [ ] Fix Do While

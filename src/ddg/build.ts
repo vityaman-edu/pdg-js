@@ -108,10 +108,18 @@ export const buildDdg = (cfg: BasicBlock, ids: Map<ts.Identifier, string>): Ddg 
         const id = ids.get(target(expression)) ?? ''
         current.set(id, new Set([expression]))
       }
+      else if (ts.isExpressionStatement(statement)
+        && ts.isBinaryExpression(statement.expression)
+        && ts.isIdentifier(statement.expression.left)
+        && (statement.expression.operatorToken.kind == ts.SyntaxKind.PlusEqualsToken
+          || statement.expression.operatorToken.kind == ts.SyntaxKind.MinusEqualsToken)) {
+        const id = ids.get(statement.expression.left) ?? ''
+        current.set(id, new Set([statement.expression]))
+      }
       else if (ts.isPostfixUnaryExpression(statement)
         && ts.isIdentifier(statement.operand)) {
-        const expression = statement.operand
-        const id = ids.get(expression) ?? ''
+        const operand = statement.operand
+        const id = ids.get(operand) ?? ''
         current.set(id, new Set([statement]))
       }
     }

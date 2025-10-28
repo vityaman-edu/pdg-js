@@ -85,7 +85,11 @@ export const App = () => {
       areJumpChainsMerged,
       isSplitted,
     })
-    const ddg = buildDdg(cfg, physicalNames(ast))
+
+    let ddg = { dependencies: new Map() }
+    if (isDdgDrawn) {
+      ddg = buildDdg(cfg, physicalNames(ast))
+    }
 
     setAstText(printAst(ast))
     setCfgText(printCfg(cfg))

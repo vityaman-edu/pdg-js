@@ -51,6 +51,14 @@ export const visitSimpleStatementVariables = (
   else if (ts.isExpressionStatement(node) && isAssignmentExpression(node.expression)) {
     visitExpressionVariables(node.expression.right, visit)
   }
+  else if (ts.isExpressionStatement(node)
+    && ts.isBinaryExpression(node.expression)
+    && ts.isIdentifier(node.expression.left)
+    && (node.expression.operatorToken.kind == ts.SyntaxKind.PlusEqualsToken
+      || node.expression.operatorToken.kind == ts.SyntaxKind.MinusEqualsToken)) {
+    visitExpressionVariables(node.expression.right, visit)
+    visitExpressionVariables(node.expression.left, visit)
+  }
   else if (ts.isPostfixUnaryExpression(node)) {
     visitExpressionVariables(node.operand, visit)
   }

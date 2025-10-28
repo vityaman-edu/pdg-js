@@ -11,7 +11,7 @@ export interface Ddg {
 
 export const isAssignmentExpression = (node: ts.Node): node is ts.BinaryExpression => {
   return ts.isBinaryExpression(node)
-    && (node.operatorToken.kind == ts.SyntaxKind.FirstAssignment)
+    && node.operatorToken.kind == ts.SyntaxKind.FirstAssignment
     && ts.isIdentifier(node.left)
 }
 

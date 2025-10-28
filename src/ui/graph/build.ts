@@ -2,9 +2,9 @@ import { type Edge, MarkerType, type Node } from '@xyflow/react'
 import { forEachBasicBlock, type BasicBlock } from '../../cfg/core'
 import { toStringExpr, toStringStatements } from '../../cfg/text'
 import { isAssignmentExpression, type Assignment, type Ddg } from '../../ddg/core'
-import { visitSimpleStatementVariables } from '../../ddg/visit'
+import { visitExpressionVariables, visitSimpleStatementVariables } from '../../ddg/visit'
 import seedrandom from 'seedrandom'
-import ts from 'typescript'
+import ts, { visitIterationBody } from 'typescript'
 
 export const toGraph = (
   entry: BasicBlock,
@@ -152,6 +152,12 @@ export const toGraph = (
       else if (ts.isExpressionStatement(statement) && isAssignmentExpression(statement.expression)) {
         blockByAssignment.set(statement.expression, block)
       }
+      else if (ts.isExpressionStatement(statement)
+        && ts.isBinaryExpression(statement.expression)
+        && (statement.expression.operatorToken.kind == ts.SyntaxKind.PlusEqualsToken
+          || statement.expression.operatorToken.kind == ts.SyntaxKind.MinusEqualsToken)) {
+        blockByAssignment.set(statement.expression, block)
+      }
       else if (ts.isPostfixUnaryExpression(statement)) {
         blockByAssignment.set(statement, block)
       }
@@ -163,21 +169,31 @@ export const toGraph = (
   }
 
   forEachBasicBlock(entry, (block: BasicBlock) => {
-    block.statements.forEach((statement) => {
-      visitSimpleStatementVariables(statement, (variable) => {
-        ddg.dependencies.get(variable)?.forEach((assignment) => {
-          const source = block
-          const target = blockByAssignment.get(assignment)
-          if (target == undefined) {
-            return
-          }
+    const visit = (variable: ts.Identifier) => {
+      ddg.dependencies.get(variable)?.forEach((assignment) => {
+        const source = block
+        const target = blockByAssignment.get(assignment)
+        if (target == undefined) {
+          return
+        }
 
-          const sourceId = idByBlock.get(source) ?? ''
-          const targetId = idByBlock.get(target) ?? ''
-          edges.push(newEdge('depends', sourceId, targetId))
-        })
+        const sourceId = idByBlock.get(source) ?? ''
+        const targetId = idByBlock.get(target) ?? ''
+        edges.push(newEdge('depends', sourceId, targetId))
       })
+    }
+
+    block.statements.forEach((statement) => {
+      visitSimpleStatementVariables(statement, visit)
     })
+    switch (block.end.kind) {
+      case 'branch': {
+        visitExpressionVariables(block.end.condition, visit)
+      } break
+      case 'return': {
+        visitExpressionVariables(block.end.expression, visit)
+      } break
+    }
   })
 
   return { nodes, edges }
