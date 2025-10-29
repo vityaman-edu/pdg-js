@@ -4,7 +4,7 @@ import { toStringExpr, toStringStatements } from '../../cfg/text'
 import { isAssignmentExpression, type Assignment, type Ddg } from '../../ddg/core'
 import { visitExpressionVariables, visitSimpleStatementVariables } from '../../ddg/visit'
 import seedrandom from 'seedrandom'
-import ts, { visitIterationBody } from 'typescript'
+import ts from 'typescript'
 
 export const toGraph = (
   entry: BasicBlock,

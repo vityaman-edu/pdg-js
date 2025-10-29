@@ -68,6 +68,7 @@ export const App = () => {
       isSplitted,
       isDdgDrawn,
     )
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [systemTheme]) // Only depend on systemTheme to avoid circular dependencies
 
   const onSourceChange = useCallback((
