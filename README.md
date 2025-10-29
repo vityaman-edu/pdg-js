@@ -43,5 +43,6 @@ Program Dependence Graph for the TypeScript.
 - [x] Support exceptions
 - [x] Fix split statements and condition
 - [x] Support data dependencies from condition
-- [ ] Support data dependencies from string literal (TemplateSpan)
+- [x] Support data dependencies from string literal (TemplateSpan)
 - [x] Fix Do While
+- [x] Support function call

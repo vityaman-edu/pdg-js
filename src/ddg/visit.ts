@@ -11,10 +11,15 @@ export const referencedVariables = (node: ts.Expression): ts.Identifier[] => {
 
     if (ts.isIdentifier(node)) {
       ids.push(node)
-      return
     }
-
-    node.forEachChild(visitExpression)
+    else if (ts.isTemplateExpression(node)) {
+      node.templateSpans.forEach((span) => {
+        span.forEachChild(visitExpression)
+      })
+    }
+    else {
+      node.forEachChild(visitExpression)
+    }
   }
 
   visitExpression(node)
@@ -58,6 +63,12 @@ export const visitSimpleStatementVariables = (
       || node.expression.operatorToken.kind == ts.SyntaxKind.MinusEqualsToken)) {
     visitExpressionVariables(node.expression.right, visit)
     visitExpressionVariables(node.expression.left, visit)
+  }
+  else if (ts.isExpressionStatement(node)
+    && ts.isCallExpression(node.expression)) {
+    node.expression.arguments.forEach((argument) => {
+      visitExpressionVariables(argument, visit)
+    })
   }
   else if (ts.isPostfixUnaryExpression(node)) {
     visitExpressionVariables(node.operand, visit)
