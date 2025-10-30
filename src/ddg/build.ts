@@ -127,7 +127,11 @@ export const buildDdg = (cfg: BasicBlock, ids: Map<ts.Identifier, string>): Ddg 
     switch (block.end.kind) {
       case 'branch': {
         visitExpressionVariables(block.end.condition, visitVariable)
+
+        const backup = mapCopy(current)
         visit(block.end.then)
+
+        mapReset(current, backup)
         visit(block.end.else)
       } break
       case 'jump': {
